@@ -1,0 +1,406 @@
+/* ============ DESIGN TOKENS (colors & basics) ============ */
+:root {
+  --bg-soft-cream: #f4f1e8;
+  --bg-soft-green: #e6efdd;
+  --card-cream: #f8f4ea;
+  --card-green: #e2ebd8;
+  --accent-deep: #6f8b40;
+  --accent-soft: #9faf62;
+  --text-main: #2f3127;
+  --text-muted: #7a7f6a;
+  --border-subtle: #d7d2c4;
+}
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ============ PAGE BACKGROUND ============ */
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+
+  /* Calm dual-tone background, no harsh glass */
+  background: radial-gradient(circle at top left, var(--bg-soft-cream) 0%, #fbf8f0 45%, var(--bg-soft-green) 100%);
+  color: var(--text-main);
+  min-height: 100vh;
+}
+
+/* Wrapper */
+.dashboard-main {
+  max-width: 1200px;
+  margin: 24px auto 40px;
+  padding: 0 16px 40px;
+}
+
+/* ============ NAVBAR (calm green gradient) ============ */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: 64px;
+  padding: 0 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: linear-gradient(90deg, #768b4b, #a1bf70);
+  color: #fdfcf7;
+  box-shadow: 0 4px 18px rgba(70, 82, 39, 0.25);
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: rgba(243, 244, 239, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.brand-name {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.brand-tagline {
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.navbar-center {
+  display: flex;
+  gap: 18px;
+}
+
+.nav-link {
+  font-size: 14px;
+  text-decoration: none;
+  color: #fdfcf7;
+  padding: 6px 14px;
+  border-radius: 999px;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
+}
+
+.nav-link:hover {
+  background: rgba(46, 61, 26, 0.2);
+  transform: translateY(-1px);
+}
+
+.nav-link.active {
+  background: #fdfcf7;
+  color: #445329;
+}
+
+.navbar-right .avatar-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: rgba(243, 244, 239, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+/* ============ PAGE TITLE ============ */
+.page-title {
+  font-size: 26px;
+  font-weight: 600;
+  margin: 22px 4px 16px;
+  color: var(--text-main);
+}
+
+/* ============ GRID LAYOUT ============ */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr;
+  gap: 20px;
+}
+
+.column-left {
+  display: flex;
+  flex-direction: column;
+  gap: 18px; /* spacing between stats / quick actions / charts */
+}
+
+.column-right {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============ SOFT CARDS (neumorphism-lite) ============ */
+.card {
+  border-radius: 24px;
+  padding: 16px 20px;
+  background: var(--card-cream);
+  border: 1px solid rgba(215, 210, 196, 0.9);
+  box-shadow:
+    0 18px 30px rgba(157, 155, 128, 0.23),
+    0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: transform 0.2s ease, box-shadow 0.2s ease,
+              background 0.2s ease, border-color 0.2s ease;
+  animation: cardFadeIn 0.45s ease-out;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 24px 40px rgba(130, 128, 96, 0.28),
+    0 1px 0 rgba(255, 255, 255, 0.9);
+  background: #fbf8f0;
+  border-color: #d1cbb6;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text-main);
+}
+
+/* ============ STATS CARD ============ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 10px 8px;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #f6f1e5, #ebe3cf);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -1px 0 rgba(210, 192, 155, 0.4);
+}
+
+.stat-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 6px;
+  font-size: 18px;
+}
+
+.stat-icon-blue {
+  background: rgba(143, 178, 206, 0.4);
+}
+
+.stat-icon-orange {
+  background: rgba(216, 166, 101, 0.4);
+}
+
+.stat-icon-green {
+  background: rgba(148, 188, 107, 0.5);
+}
+
+.stat-number {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ============ QUICK ACTIONS ============ */
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.quick-btn {
+  border: none;
+  border-radius: 20px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-main);
+
+  background: linear-gradient(145deg, #f1f6ed, #dde7cf);
+  box-shadow:
+    0 10px 20px rgba(151, 168, 125, 0.25),
+    0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.quick-btn:nth-child(2) {
+  background: linear-gradient(145deg, #f4ede9, #e6d7cc);
+}
+
+.quick-btn span:first-child {
+  font-size: 20px;
+}
+
+.quick-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.03);
+  box-shadow:
+    0 16px 26px rgba(151, 168, 125, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+/* ============ CHARTS ============ */
+.chart-wrapper {
+  position: relative;
+  height: 260px;
+}
+
+/* give chart canvas a soft background & rounded shape */
+.chart-wrapper canvas {
+  background: #fdfbf5;
+  border-radius: 18px;
+}
+
+/* ============ RECENT COMPLAINTS ============ */
+.recent-card {
+  max-height: 760px;
+  overflow-y: auto;
+}
+
+.complaints-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.complaint-item {
+  border-radius: 18px;
+  padding: 12px 14px;
+  border: 1px solid #d7d2c4;
+  background: #fcfaf5;
+  box-shadow:
+    0 8px 18px rgba(175, 170, 147, 0.25),
+    0 1px 0 rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  color: var(--text-main);
+}
+
+/* subtle colored stripe effect using left border */
+.status-resolved {
+  border-left: 4px solid #75a563;
+}
+
+.status-pending {
+  border-left: 4px solid #d99a4c;
+}
+
+.status-fake {
+  border-left: 4px solid #cf5c4b;
+}
+
+.complaint-item strong {
+  font-weight: 600;
+}
+
+.complaint-status {
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.complaint-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+/* Buttons: soft green / warm red pills */
+.btn-delete,
+.btn-report {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #fdfbf6;
+  box-shadow:
+    0 9px 16px rgba(101, 102, 90, 0.25),
+    0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.btn-delete {
+  background: linear-gradient(145deg, #e37c61, #bf4e3a);
+}
+
+.btn-report {
+  background: linear-gradient(145deg, #7fa567, #56793c);
+}
+
+.btn-delete:hover,
+.btn-report:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.04);
+}
+
+/* ============ ANIMATIONS ============ */
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* small stagger for left column */
+.column-left .card:nth-child(1) { animation-delay: 0.02s; }
+.column-left .card:nth-child(2) { animation-delay: 0.06s; }
+.column-left .card:nth-child(3) { animation-delay: 0.1s; }
+.column-left .card:nth-child(4) { animation-delay: 0.14s; }
+.column-right .card { animation-delay: 0.08s; }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 960px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .navbar-center {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .navbar {
+    padding: 0 16px;
+  }
+
+  .page-title {
+    font-size: 22px;
+  }
+}

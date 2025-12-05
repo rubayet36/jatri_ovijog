@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jatri Ovijog – Community Feed</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="./css/feed.css" />
+  <link rel="stylesheet" href="./css/navbar.css" />
+</head>
+<body>
+
+
+<header class="full-navbar">
+  <!-- Left Brand Name -->
+  <div class="nav-left">
+    <span class="brand-title">Jatri_Ovijog</span>
+  </div>
+
+  <!-- HAMBURGER TOGGLE (MOBILE) -->
+  <button class="nav-toggle" aria-label="Toggle navigation">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- Center pill nav -->
+  <nav class="nav-pill" id="nav-pill">
+    <div class="nav-slider" id="nav-slider"></div>
+
+    <a href="dashboard.html" class="nav-pill-link" data-page="dashboard">
+      <span>Dashboard</span>
+      <span class="nav-pill-badge">4</span>
+    </a>
+
+    <a href="feed.html" class="nav-pill-link" data-page="feed">
+      <span>Community</span>
+    </a>
+
+    <a href="report.html" class="nav-pill-link" data-page="report">
+      <span>Report</span>
+    </a>
+
+    <a href="emergency.html" class="nav-pill-link" data-page="emergency">
+      <span>Emergency</span>
+    </a>
+  </nav>
+
+  <!-- Right: Profile + Logout -->
+  <div class="nav-right">
+    <button class="nav-icon-btn" id="profile-btn">👤</button>
+    <button class="nav-icon-btn" id="logout-btn">⎋</button>
+  </div>
+</header>
+
+
+
+
+  <!-- MAIN FEED LAYOUT -->
+  <main class="feed-main">
+    <section class="feed-header">
+      <div>
+        <h1>Community Feed</h1>
+        <p>See what fellow passengers are reporting and how authorities are responding.</p>
+      </div>
+      <button class="primary-cta" onclick="window.location.href='report.html'">
+        + Report New Issue
+      </button>
+    </section>
+
+    <!-- Filter chips -->
+    <section class="feed-filters">
+      <button class="filter-chip active" data-filter="all">All</button>
+      <button class="filter-chip" data-filter="pending">Pending</button>
+      <button class="filter-chip" data-filter="in-progress">In Progress</button>
+      <button class="filter-chip" data-filter="resolved">Resolved</button>
+    </section>
+
+    <!-- FEED GRID -->
+    <section id="feed-list" class="feed-list">
+      <!-- Cards injected by JS -->
+    </section>
+  </main>
+
+  <!-- Scripts -->
+  <!-- Scripts -->
+  <script src="./js/navbar.js"></script>
+  <script src="./js/feed.js"></script>
+</body>
+</html>
+
+  
+</body>
+</html>

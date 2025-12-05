@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jatri Ovijog – Passenger Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="./css/dashboard.css" />
+  <link rel="stylesheet" href="./css/navbar.css" />
+
+  <!-- Chart.js for graphs -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<header class="full-navbar">
+  <!-- Left Brand Name -->
+  <div class="nav-left">
+    <span class="brand-title">Jatri_Ovijog</span>
+  </div>
+
+  <!-- HAMBURGER TOGGLE (MOBILE) -->
+  <button class="nav-toggle" aria-label="Toggle navigation">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- Center pill nav -->
+  <nav class="nav-pill" id="nav-pill">
+    <div class="nav-slider" id="nav-slider"></div>
+
+    <a href="dashboard.html" class="nav-pill-link" data-page="dashboard">
+      <span>Dashboard</span>
+      <span class="nav-pill-badge">4</span>
+    </a>
+
+    <a href="feed.html" class="nav-pill-link" data-page="feed">
+      <span>Community</span>
+    </a>
+
+    <a href="report.html" class="nav-pill-link" data-page="report">
+      <span>Report</span>
+    </a>
+
+    <a href="emergency.html" class="nav-pill-link" data-page="emergency">
+      <span>Emergency</span>
+    </a>
+  </nav>
+
+  <!-- Right: Profile + Logout -->
+  <div class="nav-right">
+    <button class="nav-icon-btn" id="profile-btn">👤</button>
+    <button class="nav-icon-btn" id="logout-btn">⎋</button>
+  </div>
+</header>
+
+
+
+  <!-- ======================= -->
+  <!--    DASHBOARD CONTENT    -->
+  <!-- ======================= -->
+  <main class="dashboard-main">
+    <h1 class="page-title">Passenger Dashboard</h1>
+
+    <div class="dashboard-grid">
+      <!-- LEFT COLUMN -->
+      <section class="column-left">
+
+        <!-- Your Statistics -->
+        <section class="card stats-card">
+          <h2 class="card-title">Your Statistics</h2>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-icon stat-icon-blue">📄</div>
+              <div class="stat-number" id="stat-total">0</div>
+              <div class="stat-label">Total Reports</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-icon stat-icon-orange">⏳</div>
+              <div class="stat-number" id="stat-pending">0</div>
+              <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-icon stat-icon-green">✔️</div>
+              <div class="stat-number" id="stat-resolved">0</div>
+              <div class="stat-label">Resolved</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="card quick-actions-card">
+          <h2 class="card-title">Quick Actions</h2>
+          <div class="quick-actions-grid">
+            <button class="quick-btn" id="btnCalculateFare">
+  <span>🧮</span>
+  <span>Calculate Fare</span>
+</button>
+
+            <button class="quick-btn">
+              <span>📝</span>
+              <span>Report Issue</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Complaints per Company Chart -->
+        <section class="card">
+          <h2 class="card-title">Complaints per Company</h2>
+          <div class="chart-wrapper">
+            <canvas id="companyComplaintsChart"></canvas>
+          </div>
+        </section>
+
+        <!-- Complaints Overview Chart -->
+        <section class="card">
+          <h2 class="card-title">Complaints Overview</h2>
+          <div class="chart-wrapper">
+            <canvas id="complaintsOverviewChart"></canvas>
+          </div>
+        </section>
+
+      </section>
+
+      <!-- RIGHT COLUMN -->
+      <section class="column-right">
+
+        <!-- Recent Complaints -->
+        <section class="card recent-card">
+          <h2 class="card-title">Recent Complaints</h2>
+          <div id="recentComplaintsList" class="complaints-list">
+            <!-- Complaints will be injected here by JS -->
+          </div>
+        </section>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="./js/dashboard.js"></script>
+  <script src="./js/navbar.js"></script>
+</body>
+</html>

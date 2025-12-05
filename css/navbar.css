@@ -1,0 +1,283 @@
+:root {
+  --bg-soft-cream: #f4f1e8;
+  --bg-soft-green: #e6efdd;
+  --card-cream: #f8f4ea;
+  --card-green: #e2ebd8;
+  --accent-deep: #6f8b40;
+  --accent-soft: #9faf62;
+  --text-main: #2f3127;
+  --text-muted: #7a7f6a;
+}
+
+/* ======================== */
+/*     FULL NAVBAR WRAP     */
+/* ======================== */
+
+.full-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  width: 100%;
+  padding: 10px 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  background: #ffffffdd;
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.nav-left .brand-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #344422;
+  letter-spacing: 0.5px;
+}
+
+/* right-side icons */
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+
+  background: #ffffff;
+  font-size: 20px;
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.2),
+    0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.nav-icon-btn:hover {
+  transform: translateY(-2px);
+  background: #f0f0f0;
+}
+
+/* ======================== */
+/*        PILL NAVBAR       */
+/* ======================== */
+
+.nav-pill {
+  position: relative;
+  flex: 0 1 520px;
+  margin: 0 12px;
+  padding: 6px;
+
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+
+  background: #ffffff;
+  border-radius: 999px;
+  box-shadow:
+    0 16px 26px rgba(172, 181, 204, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.9);
+
+  overflow: hidden;
+}
+
+/* sliding green highlight */
+.nav-slider {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  height: calc(100% - 12px);
+  width: 0;
+
+  background: #b9ec87;
+  border-radius: 999px;
+  box-shadow:
+    0 8px 16px rgba(137, 175, 96, 0.45),
+    0 0 0 1px rgba(46, 61, 26, 0.15);
+
+  transition:
+    transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+    width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 0;
+}
+
+/* nav items */
+
+.nav-pill-link {
+  position: relative;
+  z-index: 1;
+
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  padding: 10px 20px;
+  border-radius: 999px;
+
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+
+  color: #2f3127;
+  cursor: pointer;
+
+  transition: color 0.2s ease, transform 0.15s ease;
+}
+
+.nav-pill-link.active {
+  color: #1b1c16;
+}
+
+.nav-pill-link:not(.active):hover {
+  transform: translateY(-1px);
+  color: #4a5b2a;
+}
+
+/* round badge on Dashboard */
+
+.nav-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 22px;
+  height: 22px;
+  border-radius: 999px;
+
+  background: #111827;
+  color: #fdfdfd;
+  font-size: 12px;
+}
+
+/* ======================== */
+/*      HAMBURGER (MOBILE)  */
+/* ======================== */
+/* ===================== */
+/*     VERTICAL DOT MENU */
+/* ===================== */
+
+.nav-toggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: none;
+  background: #ffffff;
+  box-shadow:
+     0 4px 14px rgba(0,0,0,0.25),
+     0 1px 0 rgba(255,255,255,0.8);
+  cursor: pointer;
+
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0;
+}
+
+/* turn spans into dots instead of bars */
+.nav-toggle span {
+  display: block;
+  width: 6px;      /* dot width */
+  height: 6px;     /* dot height */
+  border-radius: 50%; /* makes dots */
+  background: #333;
+}
+
+/* when open, KEEP dots (no X animation needed) */
+.nav-toggle.open span:nth-child(1),
+.nav-toggle.open span:nth-child(2),
+.nav-toggle.open span:nth-child(3) {
+  background: #333;   /* stays the same */
+  transform: none;    /* prevents X animation */
+  opacity: 1;         /* keeps dots visible */
+}
+
+/* ===================== */
+/* show on mobile only */
+/* ===================== */
+
+@media (max-width: 768px) {
+  .nav-toggle {
+    display: flex; /* show 3-dot menu on mobile */
+  }
+
+  /* pill nav + right menu hidden by default */
+  .nav-pill,
+  .nav-right {
+    display: none;
+  }
+
+  /* when open, show menu */
+  .full-navbar.is-open .nav-pill {
+    display: flex;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .full-navbar.is-open .nav-right {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+/* ======================== */
+/*        RESPONSIVE        */
+/* ======================== */
+
+@media (max-width: 768px) {
+  .full-navbar {
+    padding: 10px 14px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .nav-left .brand-title {
+    font-size: 18px;
+  }
+
+  /* show hamburger */
+  .nav-toggle {
+    display: flex;
+  }
+
+  /* hide center nav + right icons by default */
+  .nav-pill,
+  .nav-right {
+    display: none;
+  }
+
+  /* when open, show them in rows */
+  .full-navbar.is-open .nav-pill {
+    display: flex;
+    width: 100%;
+    margin: 8px 0 0;
+  }
+
+  .full-navbar.is-open .nav-right {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .nav-pill {
+    flex: 1 1 100%;
+    margin: 0;
+  }
+
+  .nav-pill-link {
+    font-size: 13px;
+    padding-inline: 12px;
+  }
+}
