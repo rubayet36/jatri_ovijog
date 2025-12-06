@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jatri Ovijog – Police Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="./css/dashboard.css" />
+  <link rel="stylesheet" href="./css/navbar.css" />
+  <link rel="stylesheet" href="./css/police-dashboard.css" />
+
+  <!-- Chart.js for graphs -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<header class="full-navbar">
+  <!-- Left Brand Name -->
+  <div class="nav-left">
+    <span class="brand-title">Jatri_Ovijog</span>
+  </div>
+
+  <!-- HAMBURGER TOGGLE (MOBILE) -->
+  <button class="nav-toggle" aria-label="Toggle navigation">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- Center pill nav (police view) -->
+  <nav class="nav-pill" id="nav-pill">
+    <div class="nav-slider" id="nav-slider"></div>
+
+    <a href="police-dashboard.html" class="nav-pill-link" data-page="police-dashboard">
+      <span>Police</span>
+    </a>
+
+    <a href="dashboard.html" class="nav-pill-link" data-page="dashboard">
+      <span>Passenger</span>
+    </a>
+
+    <a href="feed.html" class="nav-pill-link" data-page="feed">
+      <span>Community</span>
+    </a>
+
+    <a href="emergency.html" class="nav-pill-link" data-page="emergency">
+      <span>Emergency</span>
+    </a>
+  </nav>
+
+  <!-- Right: Profile + Logout -->
+  <div class="nav-right">
+    <button class="nav-icon-btn" id="profile-btn">👮</button>
+    <button class="nav-icon-btn" id="logout-btn">⎋</button>
+  </div>
+</header>
+
+<!-- ======================= -->
+<!--    POLICE DASHBOARD     -->
+<!-- ======================= -->
+<main class="dashboard-main police-main">
+  <div class="police-header">
+    <div>
+      <h1 class="page-title">Police Dashboard</h1>
+      <p class="police-subtitle">
+        Monitor active complaints, emergency alerts, and case performance in real time.
+      </p>
+    </div>
+    <div class="police-badge">
+      🎯 Priority focus: harassment & reckless driving hotspots
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <!-- LEFT COLUMN -->
+    <section class="column-left">
+      <!-- Case Statistics -->
+      <section class="card stats-card police-stats-card">
+        <h2 class="card-title">Case Statistics</h2>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-icon stat-icon-orange">🆕</div>
+            <div class="stat-number" id="police-new">0</div>
+            <div class="stat-label">New Cases</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon stat-icon-blue">🔄</div>
+            <div class="stat-number" id="police-in-progress">0</div>
+            <div class="stat-label">In Progress</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon stat-icon-green">✔️</div>
+            <div class="stat-number" id="police-resolved">0</div>
+            <div class="stat-label">Resolved</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon stat-icon-red">🚩</div>
+            <div class="stat-number" id="police-fake">0</div>
+            <div class="stat-label">Fake / Misuse</div>
+          </div>
+        </div>
+        <p class="police-meta">
+          Last updated: <span id="police-last-updated"></span>
+        </p>
+      </section>
+
+      <!-- Cases by Status -->
+      <section class="card">
+        <h2 class="card-title">Cases by Status</h2>
+        <div class="chart-wrapper">
+          <canvas id="policeStatusChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Cases by Category -->
+      <section class="card">
+        <h2 class="card-title">Cases by Category</h2>
+        <div class="chart-wrapper">
+          <canvas id="policeCategoryChart"></canvas>
+        </div>
+      </section>
+    </section>
+
+    <!-- RIGHT COLUMN -->
+    <section class="column-right">
+      <!-- Active Complaints Queue -->
+      <section class="card queue-card">
+        <div class="card-header-row">
+          <h2 class="card-title">Active Complaints Queue</h2>
+          <select id="queueStatusFilter" class="queue-filter">
+            <option value="all">All statuses</option>
+            <option value="new">New</option>
+            <option value="pending">Pending</option>
+            <option value="in-progress">In progress</option>
+          </select>
+        </div>
+        <div id="activeComplaintsList" class="police-complaints-list">
+          <!-- Complaints injected by JS -->
+        </div>
+      </section>
+
+      <!-- Emergency Alerts -->
+      <section class="card emergency-card">
+        <h2 class="card-title">Latest Emergency Alerts</h2>
+        <div id="emergencyAlertsList" class="emergency-list">
+          <!-- Alerts injected by JS -->
+        </div>
+      </section>
+    </section>
+  </div>
+</main>
+
+<!-- Scripts -->
+<script src="./js/navbar.js"></script>
+<script src="./js/police-dashboard.js"></script>
+</body>
+</html>

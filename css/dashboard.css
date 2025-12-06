@@ -404,3 +404,78 @@ body {
     font-size: 22px;
   }
 }
+/* Quick actions animation */
+.quick-btn {
+  border-radius: 16px;
+  border: none;
+  padding: 10px 14px;
+  background: #f7f1e6;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.quick-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(149, 159, 102, 0.25);
+}
+
+.quick-btn-pulse {
+  animation: quickPulse 0.25s ease-out;
+}
+
+@keyframes quickPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.96);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Trusted routes */
+.trusted-routes-card {
+  margin-top: 12px;
+}
+
+.trusted-subtitle {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.trusted-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.trusted-chip {
+  border-radius: 999px;
+  border: none;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: default;
+  background: #f7f2e6;
+}
+
+.trusted-safe {
+  background: #e0f1d1;
+  color: #365314;
+}
+
+.trusted-watch {
+  background: #fff6d9;
+  color: #854d0e;
+}
+
+.trusted-caution {
+  background: #fee2e2;
+  color: #991b1b;
+}

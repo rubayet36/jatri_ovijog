@@ -56,6 +56,24 @@ const dummyRecentComplaints = [
   },
 ];
 
+// Simple trusted route demo data
+const dummyRouteSafety = [
+  {
+    route: "Gabtoli → Jatrabari",
+    status: "safe", // safe | watch | caution
+    label: "No serious complaints in last 30 days",
+  },
+  {
+    route: "Uttara → Motijheel",
+    status: "watch",
+    label: "Some fare disputes recently",
+  },
+  {
+    route: "Mirpur-10 → Motijheel",
+    status: "caution",
+    label: "Harassment reports in peak hours",
+  },
+];
 
 // =============== STATS ===============
 
@@ -67,7 +85,6 @@ function loadDashboardStats() {
   document.getElementById("stat-resolved").textContent =
     dummyStats.resolved ?? 0;
 }
-
 
 // =============== COMPANY COMPLAINTS CHART ===============
 
@@ -102,7 +119,6 @@ function loadCompanyComplaintsChart() {
     },
   });
 }
-
 
 // =============== COMPLAINTS OVERVIEW CHART ===============
 
@@ -153,7 +169,6 @@ function loadComplaintsOverviewChart() {
   });
 }
 
-
 // =============== RECENT COMPLAINTS (RIGHT COLUMN) ===============
 
 function loadRecentComplaints() {
@@ -190,7 +205,6 @@ function loadRecentComplaints() {
     const actions = document.createElement("div");
     actions.classList.add("complaint-actions");
 
-    // Just to demo the buttons / styles
     if (status === "pending") {
       const deleteBtn = document.createElement("button");
       deleteBtn.textContent = "Delete";
@@ -225,6 +239,21 @@ function formatType(type) {
   return type.charAt(0).toUpperCase() + type.slice(1).replace(/-/g, " ");
 }
 
+// =============== TRUSTED ROUTES ===============
+
+function loadTrustedRoutes() {
+  const container = document.getElementById("trustedRoutes");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  dummyRouteSafety.forEach((r) => {
+    const chip = document.createElement("button");
+    chip.className = "trusted-chip trusted-" + r.status;
+    chip.textContent = `✅ ${r.route} – ${r.label}`;
+    container.appendChild(chip);
+  });
+}
 
 // =============== INIT ===============
 
@@ -233,11 +262,16 @@ document.addEventListener("DOMContentLoaded", () => {
   loadCompanyComplaintsChart();
   loadComplaintsOverviewChart();
   loadRecentComplaints();
+  loadTrustedRoutes();
 
   const fareBtn = document.getElementById("btnCalculateFare");
   if (fareBtn) {
     fareBtn.addEventListener("click", () => {
-      window.location.href = "fare.html";
+      fareBtn.classList.add("quick-btn-pulse");
+      setTimeout(() => {
+        fareBtn.classList.remove("quick-btn-pulse");
+        window.location.href = "fare.html"; // your fare page
+      }, 220);
     });
   }
 });

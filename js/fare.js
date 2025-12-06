@@ -1,9 +1,34 @@
 // fare.js
-// Leaflet map + OSRM distance + simple fare demo
+// Leaflet map + OSRM distance + simple fare + safety lens
 
 let map;
 let fromMarker = null;
 let toMarker = null;
+let routeLine = null;
+let routeDot = null;
+let routeDotInterval = null;
+
+// demo safety presets for known routes
+const routeSafetyPresets = {
+  "Uttara → Motijheel": {
+    safetyScore: 3,
+    harassment: 2,
+    reckless: 1,
+    peakWindow: "7–9 PM",
+  },
+  "Mirpur-10 → Motijheel": {
+    safetyScore: 2,
+    harassment: 3,
+    reckless: 1,
+    peakWindow: "7–10 PM",
+  },
+  "Gabtoli → Jatrabari": {
+    safetyScore: 4,
+    harassment: 0,
+    reckless: 1,
+    peakWindow: "5–7 PM",
+  },
+};
 
 document.addEventListener("DOMContentLoaded", () => {
   // init map centered on Dhaka
@@ -24,6 +49,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   if (btnClear) {
     btnClear.addEventListener("click", clearRoute);
+  }
+
+  const routeSelect = document.getElementById("routePreset");
+  if (routeSelect) {
+    routeSelect.addEventListener("change", handleRoutePresetChange);
   }
 });
 
@@ -46,7 +76,6 @@ function onMapClick(e) {
     updateLabels();
     updateRouteIfReady();
   } else {
-    // if both exist, move the "To" marker
     toMarker.setLatLng([lat, lng]).openPopup();
     updateLabels();
     updateRouteIfReady();
@@ -87,6 +116,19 @@ function clearRoute() {
     map.removeLayer(toMarker);
     toMarker = null;
   }
+  if (routeLine) {
+    map.removeLayer(routeLine);
+    routeLine = null;
+  }
+  if (routeDot) {
+    map.removeLayer(routeDot);
+    routeDot = null;
+  }
+  if (routeDotInterval) {
+    clearInterval(routeDotInterval);
+    routeDotInterval = null;
+  }
+
   document.getElementById("fromLabel").textContent = "Not selected";
   document.getElementById("toLabel").textContent = "Not selected";
   document.getElementById("distanceLabel").textContent = "-- km";
@@ -116,9 +158,12 @@ async function updateRouteIfReady() {
   const to = toMarker.getLatLng();
 
   try {
-    const distanceKm = await fetchDistanceKm(from, to);
-    const fareInfo = calculateFareFromDistance(distanceKm);
+    const routeData = await fetchRouteData(from, to);
+    const distanceKm = routeData.distanceKm;
 
+    drawRoutePreview(routeData.coords);
+
+    const fareInfo = calculateFareFromDistance(distanceKm);
     document.getElementById("distanceLabel").textContent =
       distanceKm.toFixed(2) + " km";
     document.getElementById("fareLabel").textContent =
@@ -131,9 +176,9 @@ async function updateRouteIfReady() {
   }
 }
 
-// ---- OSRM public routing API (no key needed) ----
-async function fetchDistanceKm(from, to) {
-  const url = `https://router.project-osrm.org/route/v1/driving/${from.lng},${from.lat};${to.lng},${to.lat}?overview=false`;
+// OSRM routing with geometry
+async function fetchRouteData(from, to) {
+  const url = `https://router.project-osrm.org/route/v1/driving/${from.lng},${from.lat};${to.lng},${to.lat}?overview=full&geometries=geojson`;
 
   const res = await fetch(url);
   if (!res.ok) {
@@ -143,17 +188,62 @@ async function fetchDistanceKm(from, to) {
   if (!data.routes || !data.routes[0]) {
     throw new Error("No route found");
   }
+
   const distanceMeters = data.routes[0].distance;
-  return distanceMeters / 1000;
+  const distanceKm = distanceMeters / 1000;
+
+  const coords =
+    data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+
+  return { distanceKm, coords };
 }
 
-// ---- SIMPLE FARE CALCULATION (replace with your PDF rules) ----
+// Draw polyline + animated dot
+function drawRoutePreview(coords) {
+  if (routeLine) {
+    map.removeLayer(routeLine);
+    routeLine = null;
+  }
+  if (routeDot) {
+    map.removeLayer(routeDot);
+    routeDot = null;
+  }
+  if (routeDotInterval) {
+    clearInterval(routeDotInterval);
+    routeDotInterval = null;
+  }
+
+  if (!coords || coords.length < 2) return;
+
+  routeLine = L.polyline(coords, {
+    color: "#9faf62",
+    weight: 5,
+    opacity: 0.8,
+  }).addTo(map);
+
+  map.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
+
+  routeDot = L.circleMarker(coords[0], {
+    radius: 6,
+    color: "#1f2933",
+    fillColor: "#b9ec87",
+    fillOpacity: 1,
+  }).addTo(map);
+
+  let index = 0;
+  routeDotInterval = setInterval(() => {
+    if (!routeDot) return;
+    routeDot.setLatLng(coords[index]);
+    index = (index + 1) % coords.length;
+  }, 90);
+}
+
+// Simple fare calculation (replace values with real PDF rules)
 function calculateFareFromDistance(distanceKm) {
-  // TODO: Replace these numbers with official Dhaka bus fare rules
-  const BASE_FARE = 10; // e.g. minimum fare
+  const BASE_FARE = 10; // minimum fare
   const BASE_DISTANCE = 2; // km included in base fare
-  const STEP_KM = 1; // charge per 1 km step after base
-  const STEP_FARE = 2.5; // extra fare per km
+  const STEP_KM = 1;
+  const STEP_FARE = 2.5;
 
   if (distanceKm <= 0) {
     return { totalFare: 0, breakdown: "Invalid distance." };
@@ -179,4 +269,36 @@ function calculateFareFromDistance(distanceKm) {
   ].join(" • ");
 
   return { totalFare: total, breakdown };
+}
+
+// ===== Safety lens: route presets =====
+function handleRoutePresetChange() {
+  const select = document.getElementById("routePreset");
+  const value = select.value;
+
+  const safetyScoreLabel = document.getElementById("safetyScoreLabel");
+  const safetyIssuesLabel = document.getElementById("safetyIssuesLabel");
+  const safetyTimeLabel = document.getElementById("safetyTimeLabel");
+
+  if (!value || !routeSafetyPresets[value]) {
+    safetyScoreLabel.textContent = "--";
+    safetyIssuesLabel.textContent = "--";
+    safetyTimeLabel.textContent =
+      "Choose a route above to see when most complaints occur.";
+    return;
+  }
+
+  const info = routeSafetyPresets[value];
+  const stars = makeStars(info.safetyScore);
+
+  safetyScoreLabel.textContent = `${stars} (${info.safetyScore}/5)`;
+  safetyIssuesLabel.textContent = `Harassment (${info.harassment}), Reckless driving (${info.reckless})`;
+  safetyTimeLabel.textContent = `Most complaints on this route happen between ${info.peakWindow}.`;
+}
+
+function makeStars(score) {
+  const full = "★★★★★";
+  const empty = "☆☆☆☆☆";
+  const clamped = Math.max(1, Math.min(5, score));
+  return full.slice(0, clamped) + empty.slice(clamped);
 }

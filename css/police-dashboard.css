@@ -1,0 +1,234 @@
+:root {
+  /* uses same palette as your other pages */
+  --accent-deep: #6f8b40;
+  --accent-soft: #9faf62;
+  --text-main: #2f3127;
+  --text-muted: #7a7f6a;
+  --card-cream: #f8f4ea;
+  --border-subtle: #d7d2c4;
+}
+
+/* header row on police dashboard */
+.police-main .police-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.police-main .police-subtitle {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.police-main .police-badge {
+  border-radius: 999px;
+  padding: 6px 14px;
+  background: #fdf6e8;
+  border: 1px solid rgba(224, 186, 116, 0.8);
+  font-size: 12px;
+}
+
+/* stats meta */
+.police-stats-card .police-meta {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* extra stat icon colors */
+.stat-icon-red {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* queue card */
+.queue-card .card-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.queue-filter {
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  padding: 6px 10px;
+  font-size: 12px;
+  background: #f7f1e6;
+  outline: none;
+}
+
+.queue-filter:focus {
+  border-color: var(--accent-soft);
+}
+
+/* complaint list */
+.police-complaints-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.police-complaint-card {
+  border-radius: 16px;
+  padding: 10px 12px;
+  background: #fffaf0;
+  border-left: 4px solid #facc15;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.police-complaint-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.police-complaint-title {
+  font-weight: 600;
+}
+
+.priority-pill {
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 11px;
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.priority-high {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.priority-critical {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+
+.police-complaint-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.police-tag {
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: #f3f4f6;
+}
+
+.police-complaint-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.police-status-pill {
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 11px;
+}
+
+.status-new {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+.status-in-progress {
+  background: #e0f2fe;
+  color: #1d4ed8;
+}
+.status-resolved {
+  background: #dcfce7;
+  color: #15803d;
+}
+.status-fake {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.police-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.police-action-btn {
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  padding: 3px 8px;
+  background: #ffffff;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+/* emergency list */
+.emergency-card {
+  margin-top: 10px;
+}
+
+.emergency-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.emergency-item {
+  border-radius: 14px;
+  padding: 8px 10px;
+  background: #fef2f2;
+  border-left: 4px solid #ef4444;
+}
+
+.emergency-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.emergency-id {
+  font-weight: 600;
+}
+
+.emergency-time {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.emergency-location {
+  font-size: 12px;
+}
+
+.emergency-level {
+  font-size: 11px;
+  border-radius: 999px;
+  padding: 2px 7px;
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* responsive tweaks */
+@media (max-width: 900px) {
+  .police-main .police-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

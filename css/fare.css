@@ -167,3 +167,33 @@ body {
     grid-template-columns: 1fr;
   }
 }
+/* safety lens UI */
+.pill-select {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  padding: 8px 12px;
+  background: #f7f1e6;
+  font-size: 13px;
+  outline: none;
+}
+
+.pill-select:focus {
+  border-color: var(--accent-soft);
+  box-shadow: 0 0 0 1px rgba(159, 175, 98, 0.7);
+  background: #ffffff;
+}
+
+.safety-block {
+  margin-top: 10px;
+}
+
+.safety-metrics {
+  margin-top: 4px;
+}
+
+.safety-time {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+}

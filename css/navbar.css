@@ -281,3 +281,27 @@
     padding-inline: 12px;
   }
 }
+:root {
+  --bg-soft-cream: #f4f1e8;
+  --bg-soft-green: #e6efdd;
+  --card-cream: #f8f4ea;
+  --card-green: #e2ebd8;
+  --accent-deep: #6f8b40;
+  --accent-soft: #9faf62;
+  --text-main: #2f3127;
+  --text-muted: #7a7f6a;
+  --border-subtle: #d7d2c4;
+}
+
+/* Dark mode overrides */
+:root[data-theme="dark"] {
+  --bg-soft-cream: #020617;
+  --bg-soft-green: #020617;
+  --card-cream: #020617;
+  --card-green: #111827;
+  --accent-deep: #bef264;
+  --accent-soft: #a3e635;
+  --text-main: #f9fafb;
+  --text-muted: #9ca3af;
+  --border-subtle: #374151;
+}
