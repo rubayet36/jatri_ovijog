@@ -1,5 +1,5 @@
 // police-dashboard.js
-// Dummy front-end data & UI for Police Dashboard
+// Dummy front-end data & UI for Police Dashboard, now with heatmap
 
 // ===== Dummy stats =====
 const policeStats = {
@@ -16,8 +16,8 @@ const policeComplaints = [
     type: "Fare Dispute",
     description:
       "Asmani bus overcharging passengers on Airport Road. Multiple passengers reported higher than government fare.",
-    status: "in-progress", // new | pending | in-progress | resolved | fake
-    priority: "high", // low | medium | high | critical
+    status: "in-progress",
+    priority: "high",
     thana: "Uttara East",
     route: "Uttara → Motijheel",
     created_at: "2025-12-05T09:30:00Z",
@@ -98,6 +98,68 @@ const emergencyAlerts = [
   },
 ];
 
+// ===== Dummy incident points for heatmap =====
+// lat/lng values target Dhaka-ish locations, lastSeenHoursAgo indicates recency
+const incidentPoints = [
+  {
+    thana: "Farmgate",
+    route: "Mirpur-10 → Motijheel",
+    type: "Harassment",
+    lat: 23.7529,
+    lng: 90.3929,
+    count: 5,
+    lastSeenHoursAgo: 3,
+  },
+  {
+    thana: "Airport Road",
+    route: "Uttara → Motijheel",
+    type: "Fare Dispute",
+    lat: 23.8430,
+    lng: 90.4000,
+    count: 4,
+    lastSeenHoursAgo: 8,
+  },
+  {
+    thana: "Jatrabari",
+    route: "Gabtoli → Jatrabari",
+    type: "Reckless Driving",
+    lat: 23.7100,
+    lng: 90.4500,
+    count: 6,
+    lastSeenHoursAgo: 30,
+  },
+  {
+    thana: "Mohammadpur",
+    route: "Shyamoli → Motijheel",
+    type: "Fare Dispute",
+    lat: 23.7647,
+    lng: 90.3580,
+    count: 2,
+    lastSeenHoursAgo: 10,
+  },
+  {
+    thana: "Banani",
+    route: "Gulshan → Banani",
+    type: "Fake Report",
+    lat: 23.7936,
+    lng: 90.4043,
+    count: 1,
+    lastSeenHoursAgo: 80,
+  },
+  {
+    thana: "Mirpur-10",
+    route: "Mirpur-10 → Motijheel",
+    type: "Harassment",
+    lat: 23.8067,
+    lng: 90.3683,
+    count: 3,
+    lastSeenHoursAgo: 15,
+  },
+];
+let heatMapLeaflet = null; // L.map instance
+let heatCircleLayers = []; // store circle overlays
+// the L.map instance
+
 // ===== INIT =====
 document.addEventListener("DOMContentLoaded", () => {
   renderPoliceStats();
@@ -105,11 +167,21 @@ document.addEventListener("DOMContentLoaded", () => {
   renderCategoryChart();
   renderComplaintsQueue();
   renderEmergencyAlerts();
+  initHeatmap(); // NEW
+      computeForecast(); // NEW
 
   const statusFilter = document.getElementById("queueStatusFilter");
   if (statusFilter) {
     statusFilter.addEventListener("change", () => {
       renderComplaintsQueue(statusFilter.value);
+    });
+  }
+
+  const heatTimeFilter = document.getElementById("heatTimeFilter");
+  if (heatTimeFilter) {
+    heatTimeFilter.addEventListener("change", () => {
+      const value = heatTimeFilter.value; // "24", "168", "720", "all"
+      renderHeatLayer(value);
     });
   }
 });
@@ -162,11 +234,11 @@ function renderStatusChart() {
             counts.fake,
           ],
           backgroundColor: [
-            "rgba(59,130,246,0.7)", // new
-            "rgba(234,179,8,0.8)",  // pending
-            "rgba(56,189,248,0.8)", // in-progress
-            "rgba(34,197,94,0.8)",  // resolved
-            "rgba(248,113,113,0.8)", // fake
+            "rgba(59,130,246,0.7)",
+            "rgba(234,179,8,0.8)",
+            "rgba(56,189,248,0.8)",
+            "rgba(34,197,94,0.8)",
+            "rgba(248,113,113,0.8)",
           ],
         },
       ],
@@ -186,7 +258,6 @@ function renderCategoryChart() {
   if (!ctx) return;
 
   const categoryCounts = {};
-
   policeComplaints.forEach((c) => {
     const key = c.type;
     categoryCounts[key] = (categoryCounts[key] || 0) + 1;
@@ -227,7 +298,6 @@ function renderComplaintsQueue(filterStatus = "all") {
 
   const filtered = policeComplaints.filter((c) => {
     if (filterStatus === "all") {
-      // only show non-resolved & non-fake as "active"
       return c.status !== "resolved" && c.status !== "fake";
     }
     return c.status.toLowerCase() === filterStatus.toLowerCase();
@@ -284,7 +354,8 @@ function renderComplaintsQueue(filterStatus = "all") {
       </div>
     `;
 
-    const [progressBtn, resolveBtn] = card.querySelectorAll(".police-action-btn");
+    const [progressBtn, resolveBtn] =
+      card.querySelectorAll(".police-action-btn");
 
     progressBtn.addEventListener("click", () => {
       c.status = "in-progress";
@@ -293,7 +364,6 @@ function renderComplaintsQueue(filterStatus = "all") {
 
     resolveBtn.addEventListener("click", () => {
       c.status = "resolved";
-      // also bump stats in UI for demo
       policeStats.resolved++;
       renderPoliceStats();
       renderComplaintsQueue(filterStatus);
@@ -353,5 +423,249 @@ function renderEmergencyAlerts() {
     `;
 
     container.appendChild(item);
+  });
+}
+// ======== HEATMAP (circle-style) ========
+
+function initHeatmap() {
+  const mapContainer = document.getElementById("policeHeatmap");
+  if (!mapContainer || typeof L === "undefined") return;
+
+  // Create map centered on Dhaka only once
+  heatMapLeaflet = L.map("policeHeatmap", {
+    zoomControl: false,
+  }).setView([23.8103, 90.4125], 11);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "&copy; OpenStreetMap",
+  }).addTo(heatMapLeaflet);
+
+  // First render with default filter (30 days)
+  const timeFilterSelect = document.getElementById("heatTimeFilter");
+  const val = timeFilterSelect ? timeFilterSelect.value : "720";
+  renderHeatLayer(val);
+}
+
+function renderHeatLayer(hoursFilter) {
+  if (!heatMapLeaflet || typeof L === "undefined") return;
+
+  // Remove previous circles
+  heatCircleLayers.forEach((layer) => {
+    heatMapLeaflet.removeLayer(layer);
+  });
+  heatCircleLayers = [];
+
+  let maxHours = null;
+  if (hoursFilter !== "all") {
+    maxHours = parseInt(hoursFilter, 10);
+  }
+
+  const filteredPoints = incidentPoints.filter((p) => {
+    if (maxHours == null) return true;
+    return p.lastSeenHoursAgo <= maxHours;
+  });
+
+  // Add big colored circles
+  filteredPoints.forEach((p) => {
+    // Decide intensity level from count
+    let color = "#38bdf8"; // low (blue)
+    let fillOpacity = 0.35;
+    let radius = 250; // meters
+
+    if (p.count >= 5) {
+      // high
+      color = "#ef4444"; // red
+      fillOpacity = 0.5;
+      radius = 550;
+    } else if (p.count >= 3) {
+      // medium
+      color = "#f97316"; // orange
+      fillOpacity = 0.45;
+      radius = 400;
+    }
+
+    const circle = L.circle([p.lat, p.lng], {
+      radius: radius,
+      color: color,
+      weight: 1.5,
+      fillColor: color,
+      fillOpacity: fillOpacity,
+    }).addTo(heatMapLeaflet);
+
+    circle.bindPopup(
+      `<strong>${p.thana}</strong><br/>${p.route}<br/>` +
+        `${p.type} · ${p.count} report(s)`
+    );
+
+    heatCircleLayers.push(circle);
+  });
+
+  // Optionally fit bounds if we have points
+  if (filteredPoints.length) {
+    const bounds = L.latLngBounds(
+      filteredPoints.map((p) => [p.lat, p.lng])
+    );
+    heatMapLeaflet.fitBounds(bounds, { padding: [20, 20] });
+  }
+
+  renderHotspotList(filteredPoints);
+}
+
+function renderHotspotList(points) {
+  const list = document.getElementById("heatHotspotList");
+  if (!list) return;
+
+  list.innerHTML = "";
+
+  if (!points.length) {
+    list.innerHTML = `<p>No incidents in this time window.</p>`;
+    return;
+  }
+
+  // aggregate by thana / route
+  const groups = {};
+  points.forEach((p) => {
+    const key = `${p.thana} | ${p.route}`;
+    if (!groups[key]) {
+      groups[key] = {
+        thana: p.thana,
+        route: p.route,
+        totalCount: 0,
+        avgLat: 0,
+        avgLng: 0,
+        types: new Set(),
+      };
+    }
+    const g = groups[key];
+    g.totalCount += p.count;
+    g.avgLat += p.lat * p.count;
+    g.avgLng += p.lng * p.count;
+    g.types.add(p.type);
+  });
+
+  const aggregated = Object.values(groups).map((g) => {
+    const totalWeight = g.totalCount || 1;
+    return {
+      thana: g.thana,
+      route: g.route,
+      totalCount: g.totalCount,
+      lat: g.avgLat / totalWeight,
+      lng: g.avgLng / totalWeight,
+      types: Array.from(g.types),
+    };
+  });
+
+  // sort desc by totalCount & show top 5
+  aggregated.sort((a, b) => b.totalCount - a.totalCount);
+  const top = aggregated.slice(0, 5);
+
+  top.forEach((h) => {
+    const item = document.createElement("div");
+    item.className = "hotspot-item";
+    item.innerHTML = `
+      <div class="hotspot-meta">
+        <span class="hotspot-title">${h.thana}</span>
+        <span class="hotspot-issues">
+          🚌 ${h.route} • ${h.types.join(", ")}
+        </span>
+      </div>
+      <span class="hotspot-count-pill">${h.totalCount} reports</span>
+    `;
+    item.addEventListener("click", () => {
+      if (heatMapLeaflet) {
+        heatMapLeaflet.setView([h.lat, h.lng], 13);
+      }
+    });
+    list.appendChild(item);
+  });
+}
+// ===== Forecast: simple "next hotspots" model =====
+function computeForecast() {
+  const list = document.getElementById("forecastList");
+  if (!list) return;
+
+  // Aggregate by thana using incidentPoints + open complaints
+  const scores = {}; // thana -> {score, harassment, reckless, fare, sosLike}
+
+  const ensure = (thana) => {
+    if (!scores[thana]) {
+      scores[thana] = {
+        thana,
+        score: 0,
+        harassment: 0,
+        reckless: 0,
+        fare: 0,
+        openCases: 0,
+      };
+    }
+    return scores[thana];
+  };
+
+  // incidents (heatmap points)
+  incidentPoints.forEach((p) => {
+    const g = ensure(p.thana);
+    // recent incidents (<= 24h) weighted higher
+    const timeWeight = p.lastSeenHoursAgo <= 24 ? 2 : p.lastSeenHoursAgo <= 72 ? 1 : 0.5;
+    const countWeight = p.count;
+    g.score += countWeight * timeWeight;
+
+    if (p.type === "Harassment") g.harassment += p.count;
+    if (p.type === "Reckless Driving") g.reckless += p.count;
+    if (p.type === "Fare Dispute") g.fare += p.count;
+  });
+
+  // open complaints (from queue data)
+  policeComplaints.forEach((c) => {
+    const st = c.status.toLowerCase();
+    if (st === "resolved" || st === "fake") return;
+    const g = ensure(c.thana);
+    g.openCases++;
+    // open complaints add extra risk
+    g.score += 3;
+    if (c.type === "Harassment") g.harassment++;
+    if (c.type === "Reckless Driving") g.reckless++;
+    if (c.type === "Fare Dispute") g.fare++;
+  });
+
+  const arr = Object.values(scores).filter((g) => g.score > 0);
+  if (!arr.length) {
+    list.innerHTML = "<li>No risk forecast yet.</li>";
+    return;
+  }
+
+  arr.sort((a, b) => b.score - a.score);
+  const top = arr.slice(0, 3);
+
+  list.innerHTML = "";
+  top.forEach((g) => {
+    const li = document.createElement("li");
+    li.className = "forecast-item";
+
+    const level =
+      g.score >= 25 ? "Critical" : g.score >= 15 ? "High" : "Elevated";
+
+    const issues = [];
+    if (g.harassment) issues.push(`Harassment (${g.harassment})`);
+    if (g.reckless) issues.push(`Reckless (${g.reckless})`);
+    if (g.fare) issues.push(`Fare (${g.fare})`);
+
+    li.innerHTML = `
+      <div class="forecast-main">
+        <span class="forecast-title">${g.thana}</span>
+        <span class="forecast-badge">${level} risk</span>
+      </div>
+      <div class="forecast-detail">
+        Likely hotspot this evening based on recent reports.
+      </div>
+      <div class="forecast-detail">
+        Top issues: ${issues.join(", ") || "mixed incidents"}.
+      </div>
+      <div class="forecast-detail">
+        Open cases: ${g.openCases}
+      </div>
+    `;
+
+    list.appendChild(li);
   });
 }

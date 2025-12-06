@@ -12,7 +12,14 @@
 
   <!-- Chart.js for graphs -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Leaflet CSS for the heatmap map -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
 </head>
+
 <body>
 
 <header class="full-navbar">
@@ -36,12 +43,12 @@
       <span>Police</span>
     </a>
 
-    <a href="dashboard.html" class="nav-pill-link" data-page="dashboard">
-      <span>Passenger</span>
+    <a href="police-complaints.html" class="nav-pill-link" data-page="police-complaints">
+      <span>Complaints</span>
     </a>
 
-    <a href="feed.html" class="nav-pill-link" data-page="feed">
-      <span>Community</span>
+    <a href="police-chat.html" class="nav-pill-link" data-page="police-chat">
+      <span>Chats</span>
     </a>
 
     <a href="emergency.html" class="nav-pill-link" data-page="emergency">
@@ -121,6 +128,39 @@
         </div>
       </section>
     </section>
+      <!-- Incident Heatmap -->
+      <section class="card heatmap-card">
+        <div class="heatmap-header">
+          <h2 class="card-title">Incident Heatmap</h2>
+          <select id="heatTimeFilter" class="heatmap-filter">
+            <option value="24">Last 24 hours</option>
+            <option value="168">Last 7 days</option>
+            <option value="720" selected>Last 30 days</option>
+            <option value="all">All time</option>
+          </select>
+        </div>
+        <p class="heatmap-subtitle">
+          Red = more complaints (harassment, reckless driving, fare disputes).
+        </p>
+        <div id="policeHeatmap"></div>
+
+        <div class="heatmap-legend">
+          <span class="legend-label">Intensity</span>
+          <span><span class="heat-dot heat-low"></span>Low</span>
+          <span><span class="heat-dot heat-med"></span>Medium</span>
+          <span><span class="heat-dot heat-high"></span>High</span>
+        </div>
+
+        <div class="heatmap-hotspots">
+          <div class="hotspots-header">
+            <span>Hotspots (top areas)</span>
+            <span class="hotspots-note">Click to center map</span>
+          </div>
+          <div id="heatHotspotList" class="hotspot-list">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+      </section>
 
     <!-- RIGHT COLUMN -->
     <section class="column-right">
@@ -148,11 +188,22 @@
         </div>
       </section>
     </section>
+        <section class="card forecast-card">
+        <h2 class="card-title">Forecast: Next Hotspots</h2>
+        <p class="forecast-subtitle">
+          Simple prediction using recent incidents and open complaints.
+        </p>
+        <ul id="forecastList" class="forecast-list"></ul>
+      </section>
   </div>
 </main>
 
 <!-- Scripts -->
-<script src="./js/navbar.js"></script>
-<script src="./js/police-dashboard.js"></script>
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script src="./js/navbar.js"></script>
+  <script src="./js/police-dashboard.js"></script>
 </body>
 </html>
+

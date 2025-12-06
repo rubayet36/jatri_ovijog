@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jatri Ovijog – Police Complaints</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Shared styles -->
+  <link rel="stylesheet" href="./css/dashboard.css" />
+  <link rel="stylesheet" href="./css/navbar.css" />
+
+  <!-- Page-specific styles -->
+  <link rel="stylesheet" href="./css/police-complaints.css" />
+</head>
+<body>
+
+<header class="full-navbar">
+  <!-- Left Brand Name -->
+  <div class="nav-left">
+    <span class="brand-title">Jatri_Ovijog</span>
+  </div>
+
+  <!-- HAMBURGER TOGGLE (MOBILE) -->
+  <button class="nav-toggle" aria-label="Toggle navigation">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- Center pill nav -->
+  <nav class="nav-pill" id="nav-pill">
+    <div class="nav-slider" id="nav-slider"></div>
+
+    <a href="police-dashboard.html" class="nav-pill-link" data-page="police-dashboard">
+      <span>Police Home</span>
+    </a>
+  <a href="police-complaints.html" class="nav-pill-link" data-page="police-complaints">
+      <span>Complaints</span>
+    </a>
+
+    <a href="police-chat.html" class="nav-pill-link" data-page="police-chat">
+      <span>Chats</span>
+    </a>
+    <a href="emergency.html" class="nav-pill-link" data-page="emergency">
+      <span>Emergency</span>
+    </a>
+  </nav>
+
+  <!-- Right: Profile + Logout -->
+  <div class="nav-right">
+    <button class="nav-icon-btn" id="profile-btn">👮</button>
+    <button class="nav-icon-btn" id="logout-btn">⎋</button>
+  </div>
+</header>
+
+<main class="dashboard-main complaints-main">
+  <header class="complaints-header">
+    <div>
+      <h1 class="page-title">Complaints</h1>
+      <p class="complaints-subtitle">
+        Review all passenger complaints, filter by thana and status, and track buses with repeated issues.
+      </p>
+    </div>
+    <div class="complaints-badge">
+      🚌 Buses with many complaints are highlighted at the top.
+    </div>
+  </header>
+
+  <div class="complaints-layout">
+    <!-- LEFT: filters + complaint list -->
+    <section class="complaints-left">
+      <!-- Filters -->
+      <section class="card complaint-filters-card">
+        <div class="filters-row">
+          <div class="filter-group">
+            <label for="thanaFilter">Thana</label>
+            <select id="thanaFilter" class="filter-select">
+              <!-- options filled by JS -->
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>Status</label>
+            <div class="status-pills" id="statusPills">
+              <button data-status="all" class="status-pill active">All</button>
+              <button data-status="new" class="status-pill">New</button>
+              <button data-status="pending" class="status-pill">Pending</button>
+              <button data-status="in-progress" class="status-pill">In progress</button>
+              <button data-status="resolved" class="status-pill">Resolved</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="filters-row second-row">
+          <div class="filter-group">
+            <label>Category</label>
+            <div class="category-pills" id="categoryPills">
+              <button data-cat="all" class="category-pill active">All</button>
+              <button data-cat="Fare Dispute" class="category-pill">Fare dispute</button>
+              <button data-cat="Harassment" class="category-pill">Harassment</button>
+              <button data-cat="Reckless Driving" class="category-pill">Reckless driving</button>
+            </div>
+          </div>
+
+          <div class="filter-group search-group">
+            <label for="searchInput">Search</label>
+            <div class="search-wrapper">
+              <span>🔍</span>
+              <input
+                id="searchInput"
+                type="text"
+                placeholder="Search by bus no., name, route, ID…"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Complaints list -->
+      <section class="card complaints-list-card">
+        <div class="complaints-list-header">
+          <h2 class="card-title">All Complaints</h2>
+          <span id="complaintsCount" class="complaints-count"></span>
+        </div>
+        <div id="policeComplaintsList" class="complaints-list">
+          <!-- complaint cards injected by JS -->
+        </div>
+      </section>
+    </section>
+
+    <!-- RIGHT: bus hotspots + summary -->
+    <section class="complaints-right">
+      <!-- Buses with many complaints -->
+      <section class="card bus-hotspots-card">
+        <div class="bus-hotspots-header">
+          <h2 class="card-title">Buses with Most Complaints</h2>
+          <span class="hot-bus-note">Top risk vehicles in the last 30 days</span>
+        </div>
+        <div id="busHotspotsList" class="bus-hotspots-list">
+          <!-- filled by JS -->
+        </div>
+      </section>
+
+      <!-- Small summary card -->
+      <section class="card bus-summary-card">
+        <h2 class="card-title">Overview</h2>
+        <ul class="bus-summary-list" id="busSummaryList">
+          <!-- filled by JS -->
+        </ul>
+        <p class="bus-summary-note">
+          This is a front-end demo. You can later connect these stats to your Spring Boot API.
+        </p>
+      </section>
+    </section>
+  </div>
+</main>
+
+<script src="./js/navbar.js"></script>
+<script src="./js/police-complaints.js"></script>
+</body>
+</html>
