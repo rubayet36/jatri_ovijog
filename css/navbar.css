@@ -1,45 +1,139 @@
+/* ============ GLOBAL VARIABLES & RESET ============ */
 :root {
-  --bg-soft-cream: #f4f1e8;
-  --bg-soft-green: #e6efdd;
-  --card-cream: #f8f4ea;
-  --card-green: #e2ebd8;
-  --accent-deep: #6f8b40;
-  --accent-soft: #9faf62;
-  --text-main: #2f3127;
-  --text-muted: #7a7f6a;
+  /* Modern Slate Palette */
+  --bg-body: #F8FAFC;       /* Slate 50 */
+  --bg-card: #FFFFFF;       /* White */
+  --bg-glass: rgba(255, 255, 255, 0.95); /* Slightly more opaque for better readability */
+  
+  /* Brand Colors */
+  --primary: #0F172A;       /* Slate 900 */
+  --primary-light: #334155; /* Slate 700 */
+  --accent: #2563EB;        /* Royal Blue */
+  --accent-light: #EFF6FF;  /* Very Light Blue (For active states) */
+  --accent-hover: #1D4ED8;
+  
+  /* Status Colors */
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  
+  /* Text */
+  --text-main: #0F172A;
+  --text-muted: #64748B;
+  
+  /* Borders & Shadows */
+  --border-light: #E2E8F0;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
 }
 
-/* ======================== */
-/*     FULL NAVBAR WRAP     */
-/* ======================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+/* ============ MODERN NAVBAR ============ */
 .full-navbar {
   position: sticky;
   top: 0;
   z-index: 100;
-
-  width: 100%;
-  padding: 10px 24px;
-
+  height: 72px;
+  padding: 0 32px; /* Increased padding for a spacious look */
+  
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-
-  background: #ffffffdd;
+  
+  background: var(--bg-glass);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-light);
 }
 
-.nav-left .brand-title {
+/* --- BRAND --- */
+.nav-left {
+  display: flex;
+  align-items: center;
+}
+
+.brand-title {
+  font-weight: 800;
   font-size: 20px;
-  font-weight: 700;
-  color: #344422;
-  letter-spacing: 0.5px;
+  letter-spacing: -0.5px;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  cursor: pointer;
 }
 
-/* right-side icons */
+.brand-title:hover {
+  opacity: 0.9;
+}
 
+/* --- CENTER NAV (Ghost Tabs) --- */
+.nav-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Spacing between links */
+  /* Removed the gray background container for a cleaner look */
+}
+
+.nav-pill-link {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: var(--radius-md); /* Rounded corners for links */
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+
+/* Hover: Subtle Gray Background */
+.nav-pill-link:hover {
+  background: #F1F5F9;
+  color: var(--text-main);
+}
+
+/* Active: Light Blue Background + Blue Text */
+.nav-pill-link.active, 
+.nav-pill-link[aria-current="page"] {
+  background: var(--accent-light);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Notification Badge */
+.nav-pill-badge {
+  background: var(--danger);
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 99px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* --- RIGHT ACTIONS --- */
 .nav-right {
   display: flex;
   align-items: center;
@@ -49,259 +143,71 @@
 .nav-icon-btn {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  border: none;
+  border-radius: 50%; /* Fully circular buttons */
+  border: 1px solid var(--border-light);
+  background: transparent;
+  color: var(--text-muted);
   cursor: pointer;
-
-  background: #ffffff;
-  font-size: 20px;
-  box-shadow:
-    0 4px 14px rgba(0, 0, 0, 0.2),
-    0 1px 0 rgba(255, 255, 255, 0.6);
-  transition: transform 0.2s ease, background 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
 }
 
 .nav-icon-btn:hover {
-  transform: translateY(-2px);
-  background: #f0f0f0;
-}
-
-/* ======================== */
-/*        PILL NAVBAR       */
-/* ======================== */
-
-.nav-pill {
-  position: relative;
-  flex: 0 1 520px;
-  margin: 0 12px;
-  padding: 6px;
-
-  display: flex;
-  justify-content: space-between;
-  gap: 4px;
-
-  background: #ffffff;
-  border-radius: 999px;
-  box-shadow:
-    0 16px 26px rgba(172, 181, 204, 0.35),
-    0 1px 0 rgba(255, 255, 255, 0.9);
-
-  overflow: hidden;
-}
-
-/* sliding green highlight */
-.nav-slider {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  height: calc(100% - 12px);
-  width: 0;
-
-  background: #b9ec87;
-  border-radius: 999px;
-  box-shadow:
-    0 8px 16px rgba(137, 175, 96, 0.45),
-    0 0 0 1px rgba(46, 61, 26, 0.15);
-
-  transition:
-    transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
-    width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  z-index: 0;
-}
-
-/* nav items */
-
-.nav-pill-link {
-  position: relative;
-  z-index: 1;
-
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-
-  padding: 10px 20px;
-  border-radius: 999px;
-
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
-
-  color: #2f3127;
-  cursor: pointer;
-
-  transition: color 0.2s ease, transform 0.15s ease;
-}
-
-.nav-pill-link.active {
-  color: #1b1c16;
-}
-
-.nav-pill-link:not(.active):hover {
+  background: white;
+  border-color: var(--text-muted);
+  color: var(--text-main);
+  box-shadow: var(--shadow-sm);
   transform: translateY(-1px);
-  color: #4a5b2a;
 }
 
-/* round badge on Dashboard */
-
-.nav-pill-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  min-width: 22px;
-  height: 22px;
-  border-radius: 999px;
-
-  background: #111827;
-  color: #fdfdfd;
-  font-size: 12px;
+/* Specific styling for SVG icons inside buttons */
+.nav-icon-svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2px;
 }
 
-/* ======================== */
-/*      HAMBURGER (MOBILE)  */
-/* ======================== */
-/* ===================== */
-/*     VERTICAL DOT MENU */
-/* ===================== */
+/* Special hover state for Logout (Red) */
+#logout-btn:hover {
+  color: var(--danger);
+  border-color: #FECACA; /* Light Red Border */
+  background: #FEF2F2;   /* Very Light Red Bg */
+}
 
+/* --- MOBILE TOGGLE --- */
 .nav-toggle {
   display: none;
-  width: 42px;
-  height: 42px;
-  border-radius: 999px;
+  background: none;
   border: none;
-  background: #ffffff;
-  box-shadow:
-     0 4px 14px rgba(0,0,0,0.25),
-     0 1px 0 rgba(255,255,255,0.8);
   cursor: pointer;
-
-  align-items: center;
-  justify-content: center;
   flex-direction: column;
+  justify-content: center;
   gap: 5px;
-  padding: 0;
+  width: 40px;
+  height: 40px;
 }
 
-/* turn spans into dots instead of bars */
 .nav-toggle span {
-  display: block;
-  width: 6px;      /* dot width */
-  height: 6px;     /* dot height */
-  border-radius: 50%; /* makes dots */
-  background: #333;
+  width: 24px;
+  height: 2px;
+  background: var(--text-main);
+  border-radius: 2px;
+  transition: all 0.2s;
 }
 
-/* when open, KEEP dots (no X animation needed) */
-.nav-toggle.open span:nth-child(1),
-.nav-toggle.open span:nth-child(2),
-.nav-toggle.open span:nth-child(3) {
-  background: #333;   /* stays the same */
-  transform: none;    /* prevents X animation */
-  opacity: 1;         /* keeps dots visible */
-}
-
-/* ===================== */
-/* show on mobile only */
-/* ===================== */
-
-@media (max-width: 768px) {
-  .nav-toggle {
-    display: flex; /* show 3-dot menu on mobile */
-  }
-
-  /* pill nav + right menu hidden by default */
-  .nav-pill,
-  .nav-right {
-    display: none;
-  }
-
-  /* when open, show menu */
-  .full-navbar.is-open .nav-pill {
-    display: flex;
-    width: 100%;
-    margin-top: 10px;
-  }
-
-  .full-navbar.is-open .nav-right {
-    display: flex;
-    width: 100%;
-    justify-content: flex-end;
-  }
-}
-
-/* ======================== */
-/*        RESPONSIVE        */
-/* ======================== */
-
+/* --- RESPONSIVE --- */
 @media (max-width: 768px) {
   .full-navbar {
-    padding: 10px 14px;
-    gap: 8px;
-    flex-wrap: wrap;
+    padding: 0 16px;
   }
-
-  .nav-left .brand-title {
-    font-size: 18px;
+  
+  .nav-pill { 
+    display: none; /* Hidden by default on mobile, toggled via JS */
+  } 
+  
+  .nav-toggle { 
+    display: flex; 
   }
-
-  /* show hamburger */
-  .nav-toggle {
-    display: flex;
-  }
-
-  /* hide center nav + right icons by default */
-  .nav-pill,
-  .nav-right {
-    display: none;
-  }
-
-  /* when open, show them in rows */
-  .full-navbar.is-open .nav-pill {
-    display: flex;
-    width: 100%;
-    margin: 8px 0 0;
-  }
-
-  .full-navbar.is-open .nav-right {
-    display: flex;
-    width: 100%;
-    justify-content: flex-end;
-  }
-
-  .nav-pill {
-    flex: 1 1 100%;
-    margin: 0;
-  }
-
-  .nav-pill-link {
-    font-size: 13px;
-    padding-inline: 12px;
-  }
-}
-:root {
-  --bg-soft-cream: #f4f1e8;
-  --bg-soft-green: #e6efdd;
-  --card-cream: #f8f4ea;
-  --card-green: #e2ebd8;
-  --accent-deep: #6f8b40;
-  --accent-soft: #9faf62;
-  --text-main: #2f3127;
-  --text-muted: #7a7f6a;
-  --border-subtle: #d7d2c4;
-}
-
-/* Dark mode overrides */
-:root[data-theme="dark"] {
-  --bg-soft-cream: #020617;
-  --bg-soft-green: #020617;
-  --card-cream: #020617;
-  --card-green: #111827;
-  --accent-deep: #bef264;
-  --accent-soft: #a3e635;
-  --text-main: #f9fafb;
-  --text-muted: #9ca3af;
-  --border-subtle: #374151;
 }

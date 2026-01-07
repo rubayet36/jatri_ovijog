@@ -1,199 +1,227 @@
-:root {
-  --bg-soft-cream: #f4f1e8;
-  --bg-soft-green: #e6efdd;
-  --card-cream: #f8f4ea;
-  --accent-deep: #6f8b40;
-  --accent-soft: #9faf62;
-  --text-main: #2f3127;
-  --text-muted: #7a7f6a;
-  --border-subtle: #d7d2c4;
-  --shadow-soft: 0 18px 30px rgba(157, 155, 128, 0.23),
-    0 1px 0 rgba(255, 255, 255, 0.9);
-}
+/* fare.css - Modernized */
 
-* {
-  box-sizing: border-box;
+:root {
+  --bg-body: #F8FAFC;       /* Slate 50 */
+  --bg-card: #FFFFFF;
+  --primary: #2563EB;       /* Royal Blue */
+  --primary-dark: #1E40AF;
+  --text-main: #0F172A;
+  --text-muted: #64748B;
+  --border: #E2E8F0;
+  
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --radius-xl: 16px;
+  --radius-md: 8px;
 }
 
 body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-  background: radial-gradient(circle at top left, var(--bg-soft-cream) 0%,
-      #fbf8f0 45%, var(--bg-soft-green) 100%);
-  color: var(--text-main);
+  background-color: var(--bg-body);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevent body scroll, let grid handle it */
 }
 
 .fare-main {
-  max-width: 1120px;
-  margin: 24px auto 40px;
-  padding: 0 16px 40px;
+  flex: 1;
+  height: calc(100vh - 72px); /* Minus navbar */
+  position: relative;
 }
 
-.fare-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.fare-header h1 {
-  margin: 0 0 4px;
-  font-size: 26px;
-}
-
-.fare-header p {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-.fare-header-badge {
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: #fdf6e8;
-  border: 1px solid rgba(224, 186, 116, 0.8);
-  font-size: 13px;
-}
-
-/* layout */
-.fare-layout {
+.fare-grid {
   display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-  gap: 18px;
+  grid-template-columns: 1fr 400px;
+  height: 100%;
 }
 
-/* card */
-.fare-card {
-  border-radius: 22px;
-  padding: 18px 20px;
-  background: var(--card-cream);
-  border: 1px solid rgba(215, 210, 196, 0.9);
-  box-shadow: var(--shadow-soft);
+/* --- MAP SECTION --- */
+.map-section {
+  position: relative;
+  background: #E5E7EB;
 }
 
-.card-title {
-  margin: 0 0 10px;
-  font-size: 18px;
-}
-
-/* map */
 #fareMap {
   width: 100%;
-  height: 340px;
-  border-radius: 18px;
-  overflow: hidden;
-  margin-top: 8px;
+  height: 100%;
+  z-index: 1;
 }
 
-.map-help {
-  margin: 0 0 8px;
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.map-toolbar {
+.map-overlay-controls {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 500;
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-/* buttons */
-.ghost-cta {
-  border-radius: 999px;
-  border: 1px dashed rgba(140, 158, 92, 0.7);
-  background: transparent;
-  padding: 6px 12px;
-  font-size: 13px;
-  cursor: pointer;
-  color: var(--accent-deep);
-}
-
-/* info form */
-.field {
-  margin-bottom: 10px;
-}
-
-.field label {
-  display: block;
-  margin-bottom: 4px;
-  font-size: 13px;
-}
-
-.field-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
-.pill-field {
-  border-radius: 999px;
-  padding: 8px 12px;
-  background: #f7f1e6;
-  border: 1px solid var(--border-subtle);
+.map-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: 20px;
   font-size: 13px;
-}
-
-.pill-field.highlight {
-  background: #b9ec87;
-  border-color: #9caf63;
   font-weight: 600;
+  color: var(--text-main);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-/* breakdown */
-.fare-breakdown {
-  margin-top: 12px;
-  padding: 10px 12px;
-  border-radius: 16px;
-  background: #f8f3e9;
-  font-size: 13px;
+.map-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+.map-btn.secondary { color: #EF4444; }
+
+/* --- CONTROLS SECTION --- */
+.controls-section {
+  background: var(--bg-card);
+  border-left: 1px solid var(--border);
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: -4px 0 20px rgba(0,0,0,0.05);
+  z-index: 10;
 }
 
-.fare-breakdown h3 {
-  margin: 0 0 4px;
-  font-size: 14px;
+.header-block h1 { font-size: 24px; margin: 0 0 4px; color: var(--text-main); }
+.header-block p { font-size: 14px; color: var(--text-muted); margin: 0; }
+
+/* Cards Generic */
+.card {
+  background: #F8FAFC;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 16px;
 }
 
-.fare-note {
-  margin-top: 8px;
+/* Input Card (From/To visual) */
+.input-card {
+  display: flex;
+  gap: 16px;
+  background: var(--bg-card);
+  border-color: #CBD5E1;
+}
+
+.route-line-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 8px;
+}
+
+.route-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 0 1px var(--text-muted); }
+.route-dot.from { background: var(--text-main); }
+.route-dot.to { background: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
+.route-line { width: 2px; flex: 1; background: #E2E8F0; margin: 4px 0; }
+
+.route-inputs {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input-group label {
+  display: block;
   font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
   color: var(--text-muted);
+  margin-bottom: 4px;
 }
 
-/* responsive */
-@media (max-width: 900px) {
-  .fare-layout {
-    grid-template-columns: 1fr;
-  }
+.fake-input {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-/* safety lens UI */
-.pill-select {
+.fake-input.placeholder { color: #94A3B8; font-style: italic; }
+
+/* Preset Card */
+.preset-card {
+  border: 1px dashed var(--primary);
+  background: #EFF6FF;
+}
+
+.card-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+.select-wrapper select {
   width: 100%;
-  border-radius: 999px;
-  border: 1px solid var(--border-subtle);
-  padding: 8px 12px;
-  background: #f7f1e6;
+  padding: 10px;
+  border: 1px solid #BFDBFE;
+  border-radius: var(--radius-md);
+  background: white;
+  color: var(--text-main);
   font-size: 13px;
   outline: none;
 }
 
-.pill-select:focus {
-  border-color: var(--accent-soft);
-  box-shadow: 0 0 0 1px rgba(159, 175, 98, 0.7);
-  background: #ffffff;
+/* Safety Info */
+.safety-info {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #BFDBFE;
+}
+.safety-info.hidden { display: none; }
+
+.safety-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+.safety-label { color: var(--text-muted); }
+.safety-val { font-weight: 600; text-align: right; }
+.safety-note { font-size: 11px; color: #64748B; margin-top: 8px; line-height: 1.4; background: white; padding: 6px; border-radius: 4px; }
+
+/* Result Card */
+.result-card {
+  background: var(--text-main); /* Dark card */
+  color: white;
+  border: none;
+  box-shadow: var(--shadow-lg);
 }
 
-.safety-block {
-  margin-top: 10px;
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #94A3B8;
+  margin-bottom: 12px;
 }
 
-.safety-metrics {
-  margin-top: 4px;
+.fare-display {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20px;
 }
+.currency { font-size: 24px; font-weight: 500; margin-top: 6px; margin-right: 4px; color: #CBD5E1; }
+.amount { font-size: 48px; font-weight: 800; line-height: 1; letter-spacing: -1px; }
 
-.safety-time {
-  margin-top: 4px;
-  font-size: 12px;
-  color: var(--text-muted);
+.breakdown-box {
+  background: rgba(255,255,255,0.1);
+  border-radius: var(--radius-md);
+  padding: 12px;
+}
+.breakdown-title { font-size: 11px; text-transform: uppercase; font-weight: 700; color: #94A3B8; margin-bottom: 6px; }
+.breakdown-text { font-size: 12px; color: #E2E8F0; line-height: 1.5; margin: 0; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .fare-grid { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+  .controls-section { border-left: none; border-top: 1px solid var(--border); }
+  .fare-main { height: auto; min-height: calc(100vh - 72px); }
+  body { overflow: auto; }
+  #fareMap { min-height: 300px; }
 }

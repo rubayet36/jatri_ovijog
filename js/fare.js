@@ -1,304 +1,360 @@
 // fare.js
-// Leaflet map + OSRM distance + simple fare + safety lens
+// Features: Map + Fare + Smart MRT + Expanded Bus Data + Modern UI + Animated Dot
 
 let map;
 let fromMarker = null;
 let toMarker = null;
 let routeLine = null;
-let routeDot = null;
-let routeDotInterval = null;
+let routeDot = null;         // Track the animated dot
+let routeDotInterval = null; // Track the animation timer
 
-// demo safety presets for known routes
-const routeSafetyPresets = {
-  "Uttara → Motijheel": {
-    safetyScore: 3,
-    harassment: 2,
-    reckless: 1,
-    peakWindow: "7–9 PM",
-  },
-  "Mirpur-10 → Motijheel": {
-    safetyScore: 2,
-    harassment: 3,
-    reckless: 1,
-    peakWindow: "7–10 PM",
-  },
-  "Gabtoli → Jatrabari": {
-    safetyScore: 4,
-    harassment: 0,
-    reckless: 1,
-    peakWindow: "5–7 PM",
-  },
+// MRT variables
+let metroLayerGroup = L.layerGroup();
+const metroStations = [
+  { name: "Uttara North", lat: 23.8734, lng: 90.3961 },
+  { name: "Uttara Center", lat: 23.8674, lng: 90.3942 },
+  { name: "Uttara South", lat: 23.8584, lng: 90.3912 },
+  { name: "Pallabi", lat: 23.8248, lng: 90.3653 },
+  { name: "Mirpur 11", lat: 23.8169, lng: 90.3664 },
+  { name: "Mirpur 10", lat: 23.8071, lng: 90.3686 },
+  { name: "Kazipara", lat: 23.7961, lng: 90.3721 },
+  { name: "Shewrapara", lat: 23.7876, lng: 90.3751 },
+  { name: "Agargaon", lat: 23.7780, lng: 90.3787 },
+  { name: "Bijoy Sarani", lat: 23.7648, lng: 90.3861 },
+  { name: "Farmgate", lat: 23.7561, lng: 90.3895 },
+  { name: "Karwan Bazar", lat: 23.7505, lng: 90.3934 },
+  { name: "Shahbag", lat: 23.7410, lng: 90.3971 },
+  { name: "Dhaka Univ.", lat: 23.7335, lng: 90.3995 },
+  { name: "Press Club", lat: 23.7295, lng: 90.4065 },
+  { name: "Motijheel", lat: 23.7330, lng: 90.4172 },
+  { name: "Kamalapur", lat: 23.7370, lng: 90.4248 }
+];
+
+// --- BUS DATA ---
+const BUS_HUBS = [
+  // North
+  { id: "Uttara", lat: 23.8731, lng: 90.3962, r: 3.5 },
+  { id: "Airport", lat: 23.8513, lng: 90.4069, r: 2.0 },
+  { id: "Abdullahpur", lat: 23.8797, lng: 90.4005, r: 2.0 },
+  { id: "Tongi", lat: 23.8915, lng: 90.4023, r: 3.0 },
+
+  // West
+  { id: "Gabtoli", lat: 23.7832, lng: 90.3442, r: 3.0 },
+  { id: "Mirpur-1", lat: 23.7956, lng: 90.3537, r: 2.0 },
+  { id: "Mirpur-10", lat: 23.8071, lng: 90.3686, r: 2.5 },
+  { id: "Kallyanpur", lat: 23.7797, lng: 90.3581, r: 1.5 },
+  { id: "Mohammadpur", lat: 23.7594, lng: 90.3583, r: 2.0 },
+
+  // Central
+  { id: "Farmgate", lat: 23.7575, lng: 90.3890, r: 2.5 },
+  { id: "KarwanBazar", lat: 23.7515, lng: 90.3916, r: 1.8 },
+  { id: "Shahbag", lat: 23.7376, lng: 90.3954, r: 2.0 },
+  { id: "NewMarket", lat: 23.7333, lng: 90.3854, r: 1.8 },
+  { id: "Dhanmondi", lat: 23.7465, lng: 90.3760, r: 2.0 },
+
+  // East
+  { id: "Kuril", lat: 23.8103, lng: 90.4125, r: 2.0 },
+  { id: "Badda", lat: 23.7805, lng: 90.4210, r: 2.0 },
+  { id: "Rampura", lat: 23.7615, lng: 90.4203, r: 2.0 },
+  { id: "Malibagh", lat: 23.7486, lng: 90.4114, r: 1.8 },
+
+  // South
+  { id: "Motijheel", lat: 23.7330, lng: 90.4172, r: 3.0 },
+  { id: "Gulistan", lat: 23.7286, lng: 90.4104, r: 3.0 },
+  { id: "Kamalapur", lat: 23.7370, lng: 90.4248, r: 2.0 },
+  { id: "Sayedabad", lat: 23.7099, lng: 90.4287, r: 3.0 },
+  { id: "Jatrabari", lat: 23.7112, lng: 90.4331, r: 3.0 },
+
+  // Peripheral
+  { id: "Savar", lat: 23.8583, lng: 90.2667, r: 4.0 },
+  { id: "Keraniganj", lat: 23.6940, lng: 90.3636, r: 3.0 },
+  { id: "Demra", lat: 23.7223, lng: 90.4760, r: 3.0 }
+];
+;
+
+const BUS_ROUTES = [
+  // Uttara Based
+  { name: "Raida", stops: ["Abdullahpur", "Uttara", "Airport", "Kuril", "Badda", "Rampura", "Jatrabari"] },
+  { name: "Turag", stops: ["Tongi", "Uttara", "Airport", "Kuril", "Badda", "Rampura"] },
+  { name: "Airport Bangabandhu", stops: ["Uttara", "Airport", "Mohakhali", "Farmgate", "Shahbag", "Motijheel"] },
+
+  // Mirpur Based
+  { name: "Bikolpo", stops: ["Mirpur-10", "Mirpur-1", "Kallyanpur", "Farmgate", "Shahbag", "Motijheel"] },
+  { name: "Shikho", stops: ["Mirpur-10", "Farmgate", "Shahbag", "Gulistan"] },
+  { name: "Basumati", stops: ["Gabtoli", "Mirpur-1", "Farmgate", "Shahbag", "Motijheel"] },
+  { name: "Alif", stops: ["Mirpur-10", "Mohakhali", "Kuril"] },
+
+  // Gabtoli Based
+  { name: "8 Number", stops: ["Gabtoli", "Kallyanpur", "Farmgate", "Shahbag", "Jatrabari"] },
+  { name: "Achim Paribahan", stops: ["Gabtoli", "Mirpur-10", "Farmgate", "Shahbag", "Gulistan", "Sayedabad"] },
+
+  // Savar
+  { name: "Thikana", stops: ["Savar", "Gabtoli", "Farmgate", "Motijheel"] },
+  { name: "City Link", stops: ["Savar", "Gabtoli", "Mirpur-10", "Farmgate"] },
+
+  // South Dhaka
+  { name: "Somoy", stops: ["Demra", "Jatrabari", "Gulistan", "Shahbag"] },
+  { name: "Moitree", stops: ["Keraniganj", "Gulistan", "Motijheel"] },
+
+  // BRTC
+  { name: "BRTC Mirpur–Motijheel", stops: ["Mirpur-10", "Farmgate", "Shahbag", "Motijheel"] },
+  { name: "BRTC Gabtoli–Sayedabad", stops: ["Gabtoli", "Farmgate", "Gulistan", "Sayedabad"] }
+];
+
+
+const DHAKA_BOUNDS = L.latLngBounds(L.latLng(23.65, 90.30), L.latLng(23.95, 90.55));
+const routePresetsData = {
+  "Uttara → Motijheel": { coords: [[23.8731, 90.3962], [23.7330, 90.4172]] },
+  "Mirpur-10 → Motijheel": { coords: [[23.8071, 90.3686], [23.7330, 90.4172]] },
+  "Gabtoli → Jatrabari": { coords: [[23.7832, 90.3442], [23.7112, 90.4331]] },
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  // init map centered on Dhaka
-  map = L.map("fareMap").setView([23.8103, 90.4125], 12);
+  map = L.map("fareMap", { maxBounds: DHAKA_BOUNDS, minZoom: 11, zoomControl: false }).setView([23.7937, 90.4066], 12);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 20, attribution: 'OSM & CARTO' }).addTo(map);
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: "&copy; OpenStreetMap",
-  }).addTo(map);
+  map.on("click", handleMapClick);
 
-  map.on("click", onMapClick);
-
-  const btnUseCurrent = document.getElementById("btnUseCurrent");
-  const btnClear = document.getElementById("btnClear");
-
-  if (btnUseCurrent) {
-    btnUseCurrent.addEventListener("click", useCurrentLocationAsFrom);
-  }
-  if (btnClear) {
-    btnClear.addEventListener("click", clearRoute);
-  }
-
-  const routeSelect = document.getElementById("routePreset");
-  if (routeSelect) {
-    routeSelect.addEventListener("change", handleRoutePresetChange);
-  }
+  document.getElementById("btnUseCurrent")?.addEventListener("click", useCurrentLocationAsFrom);
+  document.getElementById("btnClear")?.addEventListener("click", clearRoute);
+  document.getElementById("routePreset")?.addEventListener("change", handleRoutePresetChange);
 });
 
-function onMapClick(e) {
-  const { lat, lng } = e.latlng;
+// --- CORE MAP LOGIC ---
 
-  if (!fromMarker) {
-    fromMarker = L.marker([lat, lng], { draggable: true })
-      .addTo(map)
-      .bindPopup("From")
-      .openPopup();
-    fromMarker.on("dragend", updateRouteIfReady);
-    updateLabels();
-  } else if (!toMarker) {
-    toMarker = L.marker([lat, lng], { draggable: true })
-      .addTo(map)
-      .bindPopup("To")
-      .openPopup();
-    toMarker.on("dragend", updateRouteIfReady);
-    updateLabels();
-    updateRouteIfReady();
-  } else {
-    toMarker.setLatLng([lat, lng]).openPopup();
-    updateLabels();
-    updateRouteIfReady();
-  }
+async function handleMapClick(e) {
+  if (!DHAKA_BOUNDS.contains(e.latlng)) { alert("Stay inside Dhaka!"); return; }
+  const tempPopup = L.popup().setLatLng(e.latlng).setContent('Finding nearest road...').openOn(map);
+  try {
+    const snapped = await findNearestMainRoad(e.latlng.lat, e.latlng.lng);
+    map.closePopup();
+    if (!snapped) { alert("No main road found."); return; }
+    setMarker(snapped.lat, snapped.lng);
+  } catch { map.closePopup(); }
 }
 
-function useCurrentLocationAsFrom() {
-  if (!navigator.geolocation) {
-    alert("Geolocation is not supported in this browser.");
-    return;
-  }
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      const { latitude, longitude } = pos.coords;
-      if (!fromMarker) {
-        fromMarker = L.marker([latitude, longitude], { draggable: true })
-          .addTo(map)
-          .bindPopup("From (your location)")
-          .openPopup();
-        fromMarker.on("dragend", updateRouteIfReady);
-      } else {
-        fromMarker.setLatLng([latitude, longitude]).openPopup();
-      }
-      map.setView([latitude, longitude], 13);
-      updateLabels();
-      updateRouteIfReady();
-    },
-    () => alert("Could not get current location.")
-  );
+function setMarker(lat, lng) {
+  if (!fromMarker) { fromMarker = createMarker(lat, lng, "Start"); updateLabels(); }
+  else if (!toMarker) { toMarker = createMarker(lat, lng, "End"); updateLabels(); updateRouteIfReady(); }
+  else { toMarker.setLatLng([lat, lng]).bindPopup("End").openPopup(); updateLabels(); updateRouteIfReady(); }
 }
 
-function clearRoute() {
-  if (fromMarker) {
-    map.removeLayer(fromMarker);
-    fromMarker = null;
-  }
-  if (toMarker) {
-    map.removeLayer(toMarker);
-    toMarker = null;
-  }
-  if (routeLine) {
-    map.removeLayer(routeLine);
-    routeLine = null;
-  }
-  if (routeDot) {
-    map.removeLayer(routeDot);
-    routeDot = null;
-  }
-  if (routeDotInterval) {
-    clearInterval(routeDotInterval);
-    routeDotInterval = null;
-  }
+function createMarker(lat, lng, title) { return L.marker([lat, lng]).addTo(map).bindPopup(title).openPopup(); }
 
-  document.getElementById("fromLabel").textContent = "Not selected";
-  document.getElementById("toLabel").textContent = "Not selected";
-  document.getElementById("distanceLabel").textContent = "-- km";
-  document.getElementById("fareLabel").textContent = "-- ৳";
-  document.getElementById("fareBreakdownText").textContent =
-    "Select a route to see calculation.";
+async function findNearestMainRoad(lat, lng) {
+  const query = `[out:json];way(around:600,${lat},${lng})["highway"~"^(trunk|primary|secondary|tertiary)$"];out geom;`;
+  try {
+    const r = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
+    const d = await r.json();
+    if (!d.elements.length) return null;
+    let min=Infinity, pt=null;
+    d.elements.forEach(el => el.geometry?.forEach(p => {
+      let dst = getDistance(lat, lng, p.lat, p.lon);
+      if(dst<min){ min=dst; pt={lat:p.lat, lng:p.lon}; }
+    }));
+    return pt;
+  } catch { return {lat,lng}; }
 }
 
-function updateLabels() {
-  const fromLabel = document.getElementById("fromLabel");
-  const toLabel = document.getElementById("toLabel");
-
-  if (fromMarker) {
-    const { lat, lng } = fromMarker.getLatLng();
-    fromLabel.textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-  }
-  if (toMarker) {
-    const { lat, lng } = toMarker.getLatLng();
-    toLabel.textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-  }
-}
-
+// --- RENDERING UI & ROUTING ---
 async function updateRouteIfReady() {
   if (!fromMarker || !toMarker) return;
-
-  const from = fromMarker.getLatLng();
-  const to = toMarker.getLatLng();
+  const from = fromMarker.getLatLng(), to = toMarker.getLatLng();
+  
+  const breakdownEl = document.getElementById("fareBreakdownText");
+  if(breakdownEl) breakdownEl.textContent = "Calculating best route...";
 
   try {
-    const routeData = await fetchRouteData(from, to);
-    const distanceKm = routeData.distanceKm;
+    const rData = await fetchRouteData(from, to);
+    drawRoutePreview(rData.coords);
+    
+    const busFare = calcBusFare(rData.distanceKm);
+    const metroInfo = calcMetro(from, to);
+    const busList = findSuggestedBuses(from.lat, from.lng, to.lat, to.lng);
+    const distEl = document.getElementById("distanceLabel");
+    if(distEl) distEl.textContent = rData.distanceKm.toFixed(1) + " km";
 
-    drawRoutePreview(routeData.coords);
+    // --- UI HTML ---
+    let busTagsHtml = "";
+    if (busList.length > 0) {
+      busTagsHtml = busList.map(bus => 
+        `<span style="display:inline-block; background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:12px; font-size:0.75rem; margin-right:4px; margin-bottom:4px; white-space:nowrap;">🚌 ${bus}</span>`
+      ).join("");
+    } else {
+        busTagsHtml = `<span style="font-size:0.75rem; color:#aaa;">Check local counters (No direct database match)</span>`;
+    }
 
-    const fareInfo = calculateFareFromDistance(distanceKm);
-    document.getElementById("distanceLabel").textContent =
-      distanceKm.toFixed(2) + " km";
-    document.getElementById("fareLabel").textContent =
-      Math.round(fareInfo.totalFare) + " ৳";
-    document.getElementById("fareBreakdownText").textContent =
-      fareInfo.breakdown;
-  } catch (err) {
-    console.error(err);
-    alert("Could not calculate route. Please try a different pair of points.");
+    let metroHtml = "";
+    if (metroInfo.available) {
+      metroHtml = `
+        <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.2);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+             <div style="font-size:0.9rem; color:#4ade80; font-weight:bold;">🚇 Metro Rail</div>
+             <div style="font-size:1.2rem; font-weight:bold; color:#4ade80;">${metroInfo.fare} ৳</div>
+          </div>
+          <div style="font-size:0.75rem; color:#ccc; margin-top:4px; line-height:1.4;">
+            ${metroInfo.details}
+          </div>
+        </div>
+      `;
+    }
+
+    const finalHtml = `
+      <div style="text-align:left; font-family: sans-serif;">
+        <div style="display:flex; justify-content:space-between; align-items:baseline;">
+          <span style="font-size:0.9rem; color:#93c5fd; font-weight:600;">BUS FARE</span>
+          <span style="font-size:2.2rem; font-weight:800; color:#fff;">${busFare} ৳</span>
+        </div>
+        <div style="margin-top:2px;">
+           <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px;">Recommended Buses</div>
+           <div style="line-height:1.4;">
+             ${busTagsHtml}
+           </div>
+        </div>
+        ${metroHtml}
+      </div>
+    `;
+
+    const fareContainer = document.getElementById("fareLabel"); 
+    if(fareContainer) {
+        fareContainer.innerHTML = finalHtml;
+        fareContainer.style.textAlign = "left"; 
+    }
+    if(breakdownEl) breakdownEl.textContent = "";
+
+  } catch (e) { console.error(e); }
+}
+
+// --- HELPER LOGIC ---
+
+function findSuggestedBuses(startLat, startLng, endLat, endLng) {
+  const startHub = BUS_HUBS.find(h => getDistance(startLat, startLng, h.lat, h.lng) <= h.r);
+  const endHub = BUS_HUBS.find(h => getDistance(endLat, endLng, h.lat, h.lng) <= h.r);
+  
+  if (!startHub || !endHub) return []; 
+  if (startHub.id === endHub.id && getDistance(startLat, startLng, endLat, endLng) < 3) return [];
+
+  const matches = BUS_ROUTES.filter(bus => bus.stops.includes(startHub.id) && bus.stops.includes(endHub.id));
+  return matches.map(b => b.name);
+}
+
+function getDistance(lat1, lon1, lat2, lon2) {
+  const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+async function fetchRouteData(f, t) {
+  const u = `https://router.project-osrm.org/route/v1/driving/${f.lng},${f.lat};${t.lng},${t.lat}?overview=full&geometries=geojson`;
+  const d = await (await fetch(u)).json();
+  return { distanceKm: d.routes[0].distance/1000, coords: d.routes[0].geometry.coordinates.map(([x,y])=>[y,x]) };
+}
+
+function calcBusFare(km) { return Math.ceil(Math.max(10, km*2.45)/5)*5; }
+
+function calcMetro(f, t) {
+  const getSt = p => {
+    let m={d:Infinity, s:null}; metroStations.forEach(s=>{ let d=getDistance(p.lat,p.lng,s.lat,s.lng); if(d<m.d) m={d,s}; });
+    return m;
+  };
+  const s1=getSt(f), s2=getSt(t);
+
+  if (s1.d > 2.0 || s2.d > 2.0 || s1.s.name === s2.s.name) {
+    metroLayerGroup.clearLayers(); 
+    return { available: false };
+  }
+
+  metroLayerGroup.clearLayers(); 
+  drawMetroNetwork(); 
+
+  const idx1 = metroStations.indexOf(s1.s), idx2 = metroStations.indexOf(s2.s);
+  let fare = 20 + Math.abs(idx1-idx2)*5; 
+  if(fare>100) fare=100;
+
+  return { available:true, fare, details: `Walk to <b>${s1.s.name}</b> → Ride to <b>${s2.s.name}</b>` };
+}
+
+// --- VISUALIZATION (With Animation) ---
+
+function drawMetroNetwork() {
+  const c="#16a34a"; 
+  const l=metroStations.map(s=>[s.lat, s.lng]);
+  
+  L.polyline(l, { color: c, dashArray: '12, 12', weight: 4, opacity: 0.6 }).addTo(metroLayerGroup);
+
+  metroStations.forEach(s => {
+      L.circleMarker([s.lat, s.lng], {
+          radius: 6, color: "#16a34a", fillColor: "#16a34a", fillOpacity: 1, weight: 2
+      }).addTo(metroLayerGroup).bindPopup(`<b>🚇 ${s.name}</b>`);
+  });
+  metroLayerGroup.addTo(map);
+}
+
+function drawRoutePreview(c) {
+  if(routeLine) map.removeLayer(routeLine); 
+  // 1. CLEAN UP PREVIOUS ANIMATION
+  if(routeDot) map.removeLayer(routeDot);
+  if(routeDotInterval) clearInterval(routeDotInterval);
+
+  routeLine = L.polyline(c, {
+      color: '#2563eb', // Blue
+      weight: 7,
+      opacity: 0.9,
+      lineCap: 'round',
+      lineJoin: 'round'
+  }).addTo(map); 
+  
+  map.fitBounds(routeLine.getBounds(), {padding:[50,50]});
+
+  // 2. RE-ADD THE ANIMATED DOT
+  if(c && c.length > 0) {
+      routeDot = L.circleMarker(c[0], {
+          radius: 6,
+          color: "#ffffff",
+          fillColor: "#2563eb", // Matches line color
+          fillOpacity: 1,
+          weight: 2
+      }).addTo(map);
+
+      let i = 0;
+      routeDotInterval = setInterval(() => {
+          if(!routeDot) return;
+          routeDot.setLatLng(c[i]);
+          i = (i + 1) % c.length; // Loop animation
+      }, 50); // Speed (50ms)
   }
 }
 
-// OSRM routing with geometry
-async function fetchRouteData(from, to) {
-  const url = `https://router.project-osrm.org/route/v1/driving/${from.lng},${from.lat};${to.lng},${to.lat}?overview=full&geometries=geojson`;
-
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error("OSRM request failed");
-  }
-  const data = await res.json();
-  if (!data.routes || !data.routes[0]) {
-    throw new Error("No route found");
-  }
-
-  const distanceMeters = data.routes[0].distance;
-  const distanceKm = distanceMeters / 1000;
-
-  const coords =
-    data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
-
-  return { distanceKm, coords };
-}
-
-// Draw polyline + animated dot
-function drawRoutePreview(coords) {
-  if (routeLine) {
-    map.removeLayer(routeLine);
-    routeLine = null;
-  }
-  if (routeDot) {
-    map.removeLayer(routeDot);
-    routeDot = null;
-  }
-  if (routeDotInterval) {
-    clearInterval(routeDotInterval);
-    routeDotInterval = null;
-  }
-
-  if (!coords || coords.length < 2) return;
-
-  routeLine = L.polyline(coords, {
-    color: "#9faf62",
-    weight: 5,
-    opacity: 0.8,
-  }).addTo(map);
-
-  map.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
-
-  routeDot = L.circleMarker(coords[0], {
-    radius: 6,
-    color: "#1f2933",
-    fillColor: "#b9ec87",
-    fillOpacity: 1,
-  }).addTo(map);
-
-  let index = 0;
-  routeDotInterval = setInterval(() => {
-    if (!routeDot) return;
-    routeDot.setLatLng(coords[index]);
-    index = (index + 1) % coords.length;
-  }, 90);
-}
-
-// Simple fare calculation (replace values with real PDF rules)
-function calculateFareFromDistance(distanceKm) {
-  const BASE_FARE = 10; // minimum fare
-  const BASE_DISTANCE = 2; // km included in base fare
-  const STEP_KM = 1;
-  const STEP_FARE = 2.5;
-
-  if (distanceKm <= 0) {
-    return { totalFare: 0, breakdown: "Invalid distance." };
-  }
-
-  if (distanceKm <= BASE_DISTANCE) {
-    return {
-      totalFare: BASE_FARE,
-      breakdown: `Up to ${BASE_DISTANCE} km → base fare ${BASE_FARE}৳ applied.`,
-    };
-  }
-
-  const extraKm = distanceKm - BASE_DISTANCE;
-  const steps = Math.ceil(extraKm / STEP_KM);
-  const extraFare = steps * STEP_FARE;
-  const total = BASE_FARE + extraFare;
-
-  const breakdown = [
-    `Base fare (${BASE_DISTANCE} km): ${BASE_FARE}৳`,
-    `Extra distance: ${extraKm.toFixed(2)} km (charged in ${steps} step(s))`,
-    `Extra fare: ${extraFare.toFixed(1)}৳`,
-    `Total: ${total.toFixed(1)}৳`,
-  ].join(" • ");
-
-  return { totalFare: total, breakdown };
-}
-
-// ===== Safety lens: route presets =====
+// --- UTILS ---
 function handleRoutePresetChange() {
-  const select = document.getElementById("routePreset");
-  const value = select.value;
-
-  const safetyScoreLabel = document.getElementById("safetyScoreLabel");
-  const safetyIssuesLabel = document.getElementById("safetyIssuesLabel");
-  const safetyTimeLabel = document.getElementById("safetyTimeLabel");
-
-  if (!value || !routeSafetyPresets[value]) {
-    safetyScoreLabel.textContent = "--";
-    safetyIssuesLabel.textContent = "--";
-    safetyTimeLabel.textContent =
-      "Choose a route above to see when most complaints occur.";
-    return;
+  const d = routePresetsData[document.getElementById("routePreset").value];
+  if(d) {
+    if(fromMarker) map.removeLayer(fromMarker); if(toMarker) map.removeLayer(toMarker);
+    fromMarker=createMarker(d.coords[0][0], d.coords[0][1], "Start");
+    toMarker=createMarker(d.coords[1][0], d.coords[1][1], "End");
+    updateRouteIfReady();
   }
-
-  const info = routeSafetyPresets[value];
-  const stars = makeStars(info.safetyScore);
-
-  safetyScoreLabel.textContent = `${stars} (${info.safetyScore}/5)`;
-  safetyIssuesLabel.textContent = `Harassment (${info.harassment}), Reckless driving (${info.reckless})`;
-  safetyTimeLabel.textContent = `Most complaints on this route happen between ${info.peakWindow}.`;
 }
-
-function makeStars(score) {
-  const full = "★★★★★";
-  const empty = "☆☆☆☆☆";
-  const clamped = Math.max(1, Math.min(5, score));
-  return full.slice(0, clamped) + empty.slice(clamped);
+function useCurrentLocationAsFrom() {
+   navigator.geolocation.getCurrentPosition(p=>{
+      if(!fromMarker) fromMarker=createMarker(p.coords.latitude, p.coords.longitude, "Me");
+      else fromMarker.setLatLng([p.coords.latitude, p.coords.longitude]);
+      updateRouteIfReady();
+   });
 }
+function clearRoute() {
+  if(fromMarker) map.removeLayer(fromMarker); fromMarker=null;
+  if(toMarker) map.removeLayer(toMarker); toMarker=null;
+  if(routeLine) map.removeLayer(routeLine);
+  
+  // Clean up animation on clear
+  if(routeDot) map.removeLayer(routeDot);
+  if(routeDotInterval) clearInterval(routeDotInterval);
+  
+  metroLayerGroup.clearLayers();
+
+  document.getElementById("fareLabel").innerHTML = "-- ৳";
+  document.getElementById("fareBreakdownText").textContent = "Select a route...";
+}
+function updateLabels() {}

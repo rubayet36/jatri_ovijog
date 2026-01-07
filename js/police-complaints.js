@@ -1,22 +1,19 @@
-// police-complaints.js
-// Dummy data & UI logic for Complaints page in police portal
+// police-complaints.js - Modernized Logic
 
-// ===== Dummy complaints data =====
-// Later you will replace this with real API data from Spring Boot
+// ===== Dummy Data =====
 const complaintsData = [
   {
     id: 42,
     category: "Fare Dispute",
-    status: "in-progress", // new | pending | in-progress | resolved | fake
+    status: "in-progress",
     thana: "Uttara East",
     route: "Uttara → Motijheel",
     busName: "Asmani",
     busNumber: "DHA-12-3456",
-    imageUrl: "./assets/bus-fare.jpg", // use your own image or placeholder
+    imageUrl: "./assets/bus-fare.jpg",
     createdAt: "2025-12-05T09:30:00Z",
     reporterType: "Registered User",
-    description:
-      "Conductor charged more than approved fare on Airport Road. Multiple passengers protested.",
+    description: "Conductor charged 15tk extra. Multiple passengers protested and were threatened when they refused to pay.",
   },
   {
     id: 37,
@@ -29,8 +26,7 @@ const complaintsData = [
     imageUrl: "./assets/bus-harassment.jpg",
     createdAt: "2025-12-05T14:05:00Z",
     reporterType: "Anonymous",
-    description:
-      "Passenger verbally harassed near Farmgate. Conductor did not intervene when requested.",
+    description: "Passenger verbally harassed near Farmgate. Conductor did not intervene when requested.",
   },
   {
     id: 53,
@@ -43,8 +39,7 @@ const complaintsData = [
     imageUrl: "./assets/bus-reckless.jpg",
     createdAt: "2025-12-04T18:20:00Z",
     reporterType: "Registered User",
-    description:
-      "Driver was speeding on Jatrabari flyover and braking hard. Several passengers fell inside the bus.",
+    description: "Driver was speeding on Jatrabari flyover and braking hard. Several passengers fell.",
   },
   {
     id: 61,
@@ -57,22 +52,7 @@ const complaintsData = [
     imageUrl: "./assets/bus-fare-2.jpg",
     createdAt: "2025-12-06T07:50:00Z",
     reporterType: "Student",
-    description:
-      "Conductor refused to accept student discount and threatened to drop the passenger mid-route.",
-  },
-  {
-    id: 70,
-    category: "Fare Dispute",
-    status: "fake",
-    thana: "Banani",
-    route: "Gulshan → Banani",
-    busName: "North City",
-    busNumber: "DHA-11-4521",
-    imageUrl: "./assets/bus-generic.jpg",
-    createdAt: "2025-12-03T11:15:00Z",
-    reporterType: "Unknown",
-    description:
-      "Report marked as suspicious after verification; route and timings did not match GPS data.",
+    description: "Refused student discount. Staff behavior was aggressive.",
   },
   {
     id: 81,
@@ -85,351 +65,165 @@ const complaintsData = [
     imageUrl: "./assets/bus-harassment.jpg",
     createdAt: "2025-12-06T08:30:00Z",
     reporterType: "Registered User",
-    description:
-      "Repeated verbal harassment on same bus number. Passenger felt unsafe and had to step off.",
-  },
-  {
-    id: 82,
-    category: "Harassment",
-    status: "resolved",
-    thana: "Mirpur",
-    route: "Mirpur-10 → Motijheel",
-    busName: "Raida Limited",
-    busNumber: "DHA-15-9988",
-    imageUrl: "./assets/bus-harassment.jpg",
-    createdAt: "2025-11-30T19:20:00Z",
-    reporterType: "Registered User",
-    description:
-      "Earlier harassment case on same bus number. Conductor was warned and CCTV footage reviewed.",
+    description: "Repeated harassment on the same bus number. Needs immediate review.",
   },
 ];
 
-// ===== Global filter state =====
+// ===== State =====
 let selectedThana = "all";
 let selectedStatus = "all";
-let selectedCategory = "all";
 let searchQuery = "";
 
-// ===== INIT =====
+// ===== Init =====
 document.addEventListener("DOMContentLoaded", () => {
-  initThanaFilter();
-  initStatusFilter();
-  initCategoryFilter();
-  initSearchFilter();
-
+  initFilters();
   renderComplaints();
-  renderBusHotspots();
-  renderBusSummary();
+  renderHotspots();
 });
 
 // ===== Filters =====
+function initFilters() {
+  const searchInput = document.getElementById("searchInput");
+  const thanaSelect = document.getElementById("thanaFilter");
+  const statusSelect = document.getElementById("statusFilter");
 
-function initThanaFilter() {
-  const select = document.getElementById("thanaFilter");
-  if (!select) return;
-
-  const uniqueThanas = Array.from(
-    new Set(complaintsData.map((c) => c.thana))
-  ).sort();
-
-  select.innerHTML = `
-    <option value="all">All thanas</option>
-    ${uniqueThanas.map((t) => `<option value="${t}">${t}</option>`).join("")}
-  `;
-
-  select.addEventListener("change", () => {
-    selectedThana = select.value;
-    renderComplaints();
-  });
-}
-
-function initStatusFilter() {
-  const container = document.getElementById("statusPills");
-  if (!container) return;
-
-  const pills = container.querySelectorAll(".status-pill");
-  pills.forEach((pill) => {
-    pill.addEventListener("click", () => {
-      pills.forEach((p) => p.classList.remove("active"));
-      pill.classList.add("active");
-      selectedStatus = pill.dataset.status || "all";
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      searchQuery = e.target.value.toLowerCase();
       renderComplaints();
     });
-  });
-}
+  }
 
-function initCategoryFilter() {
-  const container = document.getElementById("categoryPills");
-  if (!container) return;
-
-  const pills = container.querySelectorAll(".category-pill");
-  pills.forEach((pill) => {
-    pill.addEventListener("click", () => {
-      pills.forEach((p) => p.classList.remove("active"));
-      pill.classList.add("active");
-      selectedCategory = pill.dataset.cat || "all";
+  if (thanaSelect) {
+    thanaSelect.addEventListener("change", (e) => {
+      selectedThana = e.target.value;
       renderComplaints();
     });
-  });
+  }
+
+  if (statusSelect) {
+    statusSelect.addEventListener("change", (e) => {
+      selectedStatus = e.target.value.toLowerCase(); // Ensure lowercase matching
+      renderComplaints();
+    });
+  }
 }
 
-function initSearchFilter() {
-  const input = document.getElementById("searchInput");
-  if (!input) return;
-
-  input.addEventListener("input", () => {
-    searchQuery = input.value.trim().toLowerCase();
-    renderComplaints();
-  });
-}
-
-// ===== Data helpers =====
-
-// group by busNumber
-function groupByBus() {
-  const map = {};
-  complaintsData.forEach((c) => {
-    const key = c.busNumber;
-    if (!map[key]) {
-      map[key] = {
-        busNumber: c.busNumber,
-        busName: c.busName,
-        route: c.route,
-        thanas: new Set(),
-        total: 0,
-        openCases: 0,
-        categories: new Set(),
-        lastSeen: null,
-      };
-    }
-    const g = map[key];
-    g.total++;
-    if (c.status !== "resolved" && c.status !== "fake") {
-      g.openCases++;
-    }
-    g.thanas.add(c.thana);
-    g.categories.add(c.category);
-
-    const created = new Date(c.createdAt);
-    if (!g.lastSeen || created > g.lastSeen) {
-      g.lastSeen = created;
-    }
-  });
-  // transform sets to arrays
-  return Object.values(map).map((g) => ({
-    ...g,
-    thanas: Array.from(g.thanas),
-    categories: Array.from(g.categories),
-  }));
-}
-
-// ===== Rendering complaints list =====
+// ===== Rendering =====
 function renderComplaints() {
   const container = document.getElementById("policeComplaintsList");
-  const countBadge = document.getElementById("complaintsCount");
   if (!container) return;
 
-  const busGroups = groupByBus();
-  const busCounts = {};
-  busGroups.forEach((b) => {
-    busCounts[b.busNumber] = b.total;
-  });
+  // Filter Data
+  const filtered = complaintsData.filter(c => {
+    const matchesSearch = 
+      c.busName.toLowerCase().includes(searchQuery) || 
+      c.busNumber.toLowerCase().includes(searchQuery) ||
+      String(c.id).includes(searchQuery);
+    
+    const matchesThana = selectedThana === "all" || c.thana === selectedThana;
+    
+    // Normalize status for comparison
+    const dataStatus = c.status.toLowerCase();
+    const filterStatus = selectedStatus.toLowerCase();
+    const matchesStatus = filterStatus === "all" || dataStatus === filterStatus;
 
-  // apply filters
-  let list = complaintsData.filter((c) => {
-    if (selectedThana !== "all" && c.thana !== selectedThana) return false;
-    if (selectedStatus !== "all" && c.status !== selectedStatus) return false;
-    if (selectedCategory !== "all" && c.category !== selectedCategory)
-      return false;
-
-    if (searchQuery) {
-      const combo =
-        `${c.id} ${c.busName} ${c.busNumber} ${c.route} ${c.thana} ${c.category}`.toLowerCase();
-      if (!combo.includes(searchQuery)) return false;
-    }
-
-    return true;
-  });
-
-  // sort: buses with most complaints first, then newest first
-  list.sort((a, b) => {
-    const countA = busCounts[a.busNumber] || 0;
-    const countB = busCounts[b.busNumber] || 0;
-    if (countB !== countA) return countB - countA;
-
-    return new Date(b.createdAt) - new Date(a.createdAt);
+    return matchesSearch && matchesThana && matchesStatus;
   });
 
   container.innerHTML = "";
 
-  if (countBadge) {
-    countBadge.textContent = `${list.length} complaints shown`;
-  }
-
-  if (!list.length) {
-    container.innerHTML =
-      '<p class="empty-queue">No complaints match this filter.</p>';
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="empty-queue">No complaints found matching your filters.</div>`;
     return;
   }
 
-  list.forEach((c) => {
+  filtered.forEach(c => {
     const card = document.createElement("div");
-    card.className = "complaint-card";
-
-    const totalForBus = busCounts[c.busNumber] || 0;
-    const isHotBus = totalForBus >= 3; // threshold for "many complaints"
-    if (isHotBus) {
-      card.classList.add("bus-hot");
-    }
-
-    const statusClass = getStatusClass(c.status);
+    // Add 'bus-hot' class if this bus appears more than once in the data set (simple logic)
+    const isRepeatOffender = complaintsData.filter(x => x.busNumber === c.busNumber).length > 1;
+    card.className = `complaint-card ${isRepeatOffender ? 'bus-hot' : ''}`;
 
     card.innerHTML = `
-      ${
-        isHotBus
-          ? `<span class="bus-repeat-flag">${totalForBus} reports for this bus</span>`
-          : ""
-      }
       <div class="complaint-image-wrap">
-        <img src="${c.imageUrl}" alt="Bus photo for complaint ${c.id}" onerror="this.src='./assets/bus-placeholder.jpg'" />
+        <img src="${c.imageUrl}" alt="Evidence" onerror="this.src='./assets/bus-generic.jpg'">
       </div>
+      
       <div class="complaint-content">
         <div class="complaint-row-top">
           <div>
             <div class="complaint-id">#${c.id} · ${c.category}</div>
             <div class="complaint-bus">${c.busName} (${c.busNumber})</div>
           </div>
-          <span class="status-badge ${statusClass}">
-            ${formatStatus(c.status)}
-          </span>
+          <span class="status-badge status-${c.status.toLowerCase()}">${formatStatus(c.status)}</span>
         </div>
 
         <div class="complaint-tags">
-          <span class="tag-pill tag-category">${c.category}</span>
-          <span class="tag-pill tag-thana">${c.thana}</span>
-          <span class="tag-pill tag-route">${c.route}</span>
+          <span class="tag-pill tag-thana">📍 ${c.thana}</span>
+          <span class="tag-pill tag-route">🚌 ${c.route}</span>
+          <span class="tag-pill tag-category">🏷️ ${c.reporterType}</span>
         </div>
 
-        <p class="complaint-desc">
-          ${truncateText(c.description, 160)}
-        </p>
+        <p class="complaint-desc">${c.description}</p>
 
         <div class="complaint-meta-row">
           <div class="complaint-meta">
-            <span>🕒 ${new Date(c.createdAt).toLocaleString()}</span>
-            <span>👤 ${c.reporterType}</span>
+            <span>📅 ${new Date(c.createdAt).toLocaleDateString()}</span>
+            <span>⏰ ${new Date(c.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
           </div>
           <div class="complaint-actions">
-            <button class="complaint-btn">View details</button>
-            <button class="complaint-btn">Open case file</button>
+            <button class="complaint-btn" onclick="alert('View details #${c.id}')">Details</button>
+            <button class="complaint-btn btn-primary-ghost" onclick="alert('Open Case #${c.id}')">Open Case</button>
           </div>
         </div>
       </div>
     `;
-
     container.appendChild(card);
   });
 }
 
-// ===== Buses with most complaints =====
-function renderBusHotspots() {
+function renderHotspots() {
   const container = document.getElementById("busHotspotsList");
   if (!container) return;
 
-  const grouped = groupByBus();
-  // sort by total complaints desc
-  grouped.sort((a, b) => b.total - a.total);
+  // Group by bus number
+  const counts = {};
+  complaintsData.forEach(c => {
+    if (!counts[c.busNumber]) {
+      counts[c.busNumber] = { count: 0, name: c.busName, route: c.route };
+    }
+    counts[c.busNumber].count++;
+  });
+
+  // Convert to array and sort
+  const sorted = Object.entries(counts)
+    .map(([num, data]) => ({ num, ...data }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5); // Top 5
 
   container.innerHTML = "";
-
-  if (!grouped.length) {
-    container.innerHTML = "<p>No bus data available.</p>";
-    return;
-  }
-
-  grouped.slice(0, 5).forEach((bus) => {
+  sorted.forEach(bus => {
     const item = document.createElement("div");
     item.className = "bus-hotspot-item";
-
-    const catText = bus.categories.join(", ");
-    const thanasText = bus.thanas.join(", ");
+    item.onclick = () => {
+        document.getElementById("searchInput").value = bus.num;
+        searchQuery = bus.num.toLowerCase();
+        renderComplaints();
+    };
 
     item.innerHTML = `
-      <div class="bus-hotspot-meta">
-        <span class="bus-hotspot-title">${bus.busName} (${bus.busNumber})</span>
-        <span class="bus-hotspot-sub">
-          🚌 ${bus.route}
-        </span>
-        <span class="bus-hotspot-sub">
-          📍 ${thanasText} • ${catText}
-        </span>
+      <div>
+        <span class="bus-hotspot-title">${bus.name} (${bus.num})</span>
+        <span class="bus-hotspot-sub">${bus.route}</span>
       </div>
-      <span class="bus-hotspot-count">${bus.total} reports</span>
+      <span class="bus-hotspot-count">${bus.count} Reports</span>
     `;
-
-    // click could later open filtered view just for this bus
-    item.addEventListener("click", () => {
-      // fast filter by this bus in list
-      searchQuery = bus.busNumber.toLowerCase();
-      const searchInput = document.getElementById("searchInput");
-      if (searchInput) searchInput.value = bus.busNumber;
-      renderComplaints();
-    });
-
     container.appendChild(item);
   });
 }
 
-// ===== Summary =====
-function renderBusSummary() {
-  const list = document.getElementById("busSummaryList");
-  if (!list) return;
-
-  const totalComplaints = complaintsData.length;
-  const openComplaints = complaintsData.filter(
-    (c) => c.status !== "resolved" && c.status !== "fake"
-  ).length;
-  const harassmentCount = complaintsData.filter(
-    (c) => c.category === "Harassment"
-  ).length;
-  const fareDisputeCount = complaintsData.filter(
-    (c) => c.category === "Fare Dispute"
-  ).length;
-  const recklessCount = complaintsData.filter(
-    (c) => c.category === "Reckless Driving"
-  ).length;
-
-  const grouped = groupByBus();
-  const busesOverThreshold = grouped.filter((b) => b.total >= 3).length;
-
-  list.innerHTML = `
-    <li><strong>${totalComplaints}</strong> total complaints</li>
-    <li><strong>${openComplaints}</strong> active / pending cases</li>
-    <li><strong>${harassmentCount}</strong> harassment, <strong>${fareDisputeCount}</strong> fare disputes, <strong>${recklessCount}</strong> reckless driving</li>
-    <li><strong>${busesOverThreshold}</strong> buses flagged as high-risk (3+ complaints)</li>
-  `;
-}
-
 // ===== Helpers =====
-function getStatusClass(status) {
-  const st = status.toLowerCase();
-  if (st === "new") return "status-new";
-  if (st === "pending") return "status-pending";
-  if (st === "in-progress") return "status-in-progress";
-  if (st === "resolved") return "status-resolved";
-  if (st === "fake") return "status-fake";
-  return "";
-}
-
-function formatStatus(status) {
-  if (!status) return "";
-  const s = status.toLowerCase();
-  if (s === "in-progress") return "In progress";
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
-
-function truncateText(text, maxLength) {
-  if (!text) return "";
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength - 3) + "...";
+function formatStatus(st) {
+  if (st === 'in-progress') return 'In Progress';
+  return st.charAt(0).toUpperCase() + st.slice(1);
 }
