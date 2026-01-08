@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jatri Ovijog - Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Modern glassmorphism login page" />
+  <!-- Global UI design system -->
+  <link rel="stylesheet" href="./css/ui.css">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+  <main class="auth-wrapper">
+    <section class="auth-card">
+      <h1 class="auth-title">Log in</h1>
+      <p class="auth-subtitle">Welcome back! Please sign in to continue.</p>
+
+      <form id="loginForm" action="/login" method="POST">
+  <div class="field">
+    <label for="email">Email</label>
+    <input
+      type="email"
+      id="email"
+      name="email"
+      placeholder="you@example.com"
+      required
+    />
+  </div>
+
+  <div class="field">
+    <label for="password">Password</label>
+    <input
+      type="password"
+      id="password"
+      name="password"
+      placeholder="••••••••"
+      required
+    />
+  </div>
+
+  <!-- NEW: choose User or Police -->
+  <div class="field">
+    <label>Log in as</label>
+    <div class="role-options">
+      <label>
+        <input type="radio" name="accountType" value="user" required />
+        User
+      </label>
+      <label>
+        <input type="radio" name="accountType" value="police" required />
+        Police
+      </label>
+    </div>
+  </div>
+
+  <button type="submit" class="btn-primary">Log In</button>
+</form>
+
+      <!-- Emergency button: allow quick access to emergency reporting -->
+      <button type="button" class="btn-emergency" onclick="window.location.href='emergency.html'">Emergency</button>
+
+
+      <p class="auth-extra">
+        Don’t have an account?
+        <a href="./signup.html">Sign up</a>
+      </p>
+
+      <footer class="auth-footer">
+        &copy; 2025 Your Name
+      </footer>
+    </section>
+  </main>
+
+  <script src="./js/script.js"></script>
+</body>
+</html>

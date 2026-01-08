@@ -1,30 +1,18 @@
-<!-- Simple pill navbar, matches the screenshot design -->
-<nav class="nav-pill" id="nav-pill">
-  <!-- sliding green highlight -->
-  <div class="nav-slider" id="nav-slider"></div>
+<header class="navbar">
+  <div class="nav-left">
+    <span class="logo">Jatri_Ovijog</span>
+  </div>
 
-  <a href="dashboard.html"
-     class="nav-pill-link active"
-     data-page="dashboard">
-    <span>Dashboard</span>
-    <span class="nav-pill-badge">4</span>
-  </a>
+  <button class="nav-toggle" id="navToggle">☰</button>
 
-  <a href="feed.html"
-     class="nav-pill-link"
-     data-page="community">
-    <span>Community</span>
-  </a>
+  <nav class="nav-menu" id="navMenu">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="feed.html">Feed</a>
+    <a href="report.html">Report</a>
 
-  <a href="report.html"
-     class="nav-pill-link"
-     data-page="report">
-    <span>Report</span>
-  </a>
+    <div class="nav-divider"></div>
 
-  <a href="emergency.html"
-     class="nav-pill-link"
-     data-page="emergency">
-    <span>Emergency</span>
-  </a>
-</nav>
+    <button class="nav-profile">Profile</button>
+    <button class="nav-logout">Logout</button>
+  </nav>
+</header>

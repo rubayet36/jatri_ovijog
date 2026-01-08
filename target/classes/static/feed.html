@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jatri Ovijog – Community Feed</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Global UI design system -->
+  <link rel="stylesheet" href="./css/ui.css" />
+  <link rel="stylesheet" href="./css/feed.css" />
+  <link rel="stylesheet" href="./css/navbar.css" />
+</head>
+<body>
+
+<header class="full-navbar">
+  <div class="nav-left">
+    <a href="dashboard.html" class="brand-title"><span>Jatri_Ovijog</span></a>
+  </div>
+  <button class="nav-toggle" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-collapsible">
+    <div class="nav-pill" id="nav-pill">
+      <div class="nav-slider" id="nav-slider"></div>
+      <a href="dashboard.html" class="nav-pill-link" data-page="dashboard"><span>Dashboard</span><span class="nav-pill-badge">4</span></a>
+      <a href="feed.html" class="nav-pill-link" data-page="feed"><span>Community</span></a>
+      <a href="report.html" class="nav-pill-link" data-page="report"><span>Report</span></a>
+      <a href="emergency.html" class="nav-pill-link" data-page="emergency"><span>Emergency</span></a>
+    </div>
+    <div class="nav-right">
+      <button class="nav-icon-btn" id="theme-toggle" title="Toggle Theme">🌙</button>
+      <button class="nav-icon-btn" id="profile-btn" title="Profile">👤</button>
+      <button class="nav-icon-btn" id="logout-btn" title="Sign Out">⎋</button>
+    </div>
+  </div>
+</header>
+<div class="nav-backdrop" aria-hidden="true"></div>
+
+<main class="feed-main">
+  <section class="feed-header">
+    <div>
+      <h1>Community Feed</h1>
+      <p>Real-time reports from Dhaka commuters.</p>
+    </div>
+    <button class="primary-cta" onclick="window.location.href='report.html'">
+      + Report Issue
+    </button>
+  </section>
+
+  <section class="feed-toolbar">
+    
+    <div class="toolbar-group">
+      <span class="toolbar-label">Sort by:</span>
+      <div class="chip-row">
+        <button class="sort-chip active" data-sort="recent">Most Recent</button>
+        <button class="sort-chip" data-sort="top-react">Top Reacts</button>
+        <button class="sort-chip" data-sort="top-comment">Top Comments</button>
+      </div>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <div class="toolbar-group">
+      <span class="toolbar-label">Filter Status:</span>
+      <div class="chip-row">
+        <button class="filter-chip active" data-filter="all">All</button>
+        <button class="filter-chip" data-filter="pending">Pending</button>
+        <button class="filter-chip" data-filter="in-progress">In Progress</button>
+        <button class="filter-chip" data-filter="resolved">Resolved</button>
+      </div>
+    </div>
+
+  </section>
+
+  <section id="feed-list" class="feed-list">
+    </section>
+</main>
+
+<script src="./js/navbar.js"></script>
+<script src="./js/feed.js"></script>
+</body>
+</html>

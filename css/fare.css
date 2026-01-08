@@ -224,4 +224,41 @@ body {
   .fare-main { height: auto; min-height: calc(100vh - 72px); }
   body { overflow: auto; }
   #fareMap { min-height: 300px; }
+}/* --- MOBILE FARE PAGE FIXES --- */
+@media (max-width: 900px) {
+  /* Reset body height so we can scroll naturally */
+  body {
+    height: auto;
+    overflow-y: auto;
+  }
+
+  .fare-main {
+    height: auto;
+    display: block;
+  }
+
+  .fare-grid {
+    display: flex;
+    flex-direction: column; /* Stack map on top, controls on bottom */
+    height: auto;
+  }
+
+  .map-section {
+    height: 40vh; /* Map takes top 40% of screen */
+    min-height: 300px;
+  }
+
+  .controls-section {
+    height: auto;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    padding: 20px 16px;
+    overflow: visible;
+  }
+
+  /* Fix input cards looking squashed */
+  .input-card {
+    flex-direction: row; /* Keep dots and inputs aligned */
+    padding: 12px;
+  }
 }

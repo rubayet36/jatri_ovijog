@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jatri Ovijog - Sign up</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Modern glassmorphism signup page" />
+  <!-- Global UI design system -->
+  <link rel="stylesheet" href="./css/ui.css">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+  <main class="auth-wrapper">
+    <section class="auth-card">
+      <h1 class="auth-title">Create account</h1>
+      <p class="auth-subtitle">Join Jatri Ovijog and get started.</p>
+
+    <form id="signupForm" action="/signup" method="POST">
+  <div class="field">
+    <label for="name">Full name</label>
+    <input
+      type="text"
+      id="name"
+      name="name"
+      placeholder="Your name"
+      required
+    />
+  </div>
+
+  <div class="field">
+    <label for="email">Email</label>
+    <input
+      type="email"
+      id="email"
+      name="email"
+      placeholder="you@example.com"
+      required
+    />
+  </div>
+
+  <div class="field">
+    <label for="password">Password</label>
+    <input
+      type="password"
+      id="password"
+      name="password"
+      placeholder="At least 6 characters"
+      required
+    />
+  </div>
+
+  <div class="field">
+    <label for="confirmPassword">Confirm password</label>
+    <input
+      type="password"
+      id="confirmPassword"
+      name="confirmPassword"
+      placeholder="Repeat your password"
+      required
+    />
+  </div>
+
+  <!-- NEW: choose User or Police -->
+  <div class="field">
+    <label>Sign up as</label>
+    <div class="role-options">
+      <label>
+        <input type="radio" name="accountType" value="user" required />
+        User
+      </label>
+      <label>
+        <input type="radio" name="accountType" value="police" required />
+        Police
+      </label>
+    </div>
+  </div>
+
+  <div class="field">
+    <label style="display:flex; gap:8px; align-items:flex-start; font-size:12px;">
+      <input type="checkbox" id="terms" name="terms" style="width:auto; margin-top:3px;" />
+      <span>I agree to the <a href="#" target="_blank">Terms &amp; Conditions</a>.</span>
+    </label>
+  </div>
+
+  <button type="submit" class="btn-primary">Sign up</button>
+</form>
+
+
+      <p class="auth-extra">
+        Already have an account?
+        <a href="index.html">Log in</a>
+      </p>
+
+      <footer class="auth-footer">
+        &copy; 2025 Your Name
+      </footer>
+    </section>
+  </main>
+
+  <script src="./js/signup.js"></script>
+</body>
+</html>

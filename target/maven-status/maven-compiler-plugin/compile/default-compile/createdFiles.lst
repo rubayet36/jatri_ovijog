@@ -1,0 +1,11 @@
+com\jatriovijog\model\Complaint.class
+com\jatriovijog\controller\ComplaintController.class
+com\jatriovijog\JatriOvijogApplication.class
+com\jatriovijog\service\SupabaseService$1.class
+com\jatriovijog\util\JwtUtil.class
+com\jatriovijog\service\SupabaseService.class
+com\jatriovijog\model\EmergencyReport.class
+com\jatriovijog\controller\AuthController.class
+com\jatriovijog\config\SecurityConfig.class
+com\jatriovijog\controller\EmergencyController.class
+com\jatriovijog\model\User.class
